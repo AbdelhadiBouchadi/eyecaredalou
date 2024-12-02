@@ -4,7 +4,6 @@ import React from 'react';
 import { TbUser } from 'react-icons/tb';
 import { AiOutlinePoweroff } from 'react-icons/ai';
 import { BiMenu } from 'react-icons/bi';
-import { redirect } from 'next/navigation';
 import MenuDrawer from './MenuDrawer';
 import MenuSelect from './MenuSelect';
 

@@ -3,34 +3,23 @@ import { TbUsers } from 'react-icons/tb';
 import { FaRegCalendarAlt } from 'react-icons/fa';
 import { RiUserHeartLine } from 'react-icons/ri';
 import { AiOutlineSetting } from 'react-icons/ai';
-import { HiOutlineMail } from 'react-icons/hi';
 import {
   TbCalendar,
   TbChartHistogram,
   TbFile,
-  TbFileInvoice,
   TbLockAccess,
 } from 'react-icons/tb';
-import { FaTelegramPlane, FaWhatsapp } from 'react-icons/fa';
+
 import {
   RiFileList3Line,
   RiHeartLine,
   RiImageLine,
   RiLockPasswordLine,
-  RiMedicineBottleLine,
   RiMoneyDollarCircleLine,
   RiStethoscopeLine,
   RiUserLine,
 } from 'react-icons/ri';
-import {
-  MdListAlt,
-  MdOutlineAttachMoney,
-  MdOutlineCampaign,
-  MdOutlineChat,
-  MdOutlineInventory2,
-  MdOutlineReviews,
-  MdOutlineTextsms,
-} from 'react-icons/md';
+import { MdOutlineReviews } from 'react-icons/md';
 import { BiCalendar, BiUserPlus } from 'react-icons/bi';
 
 export const MenuDatas = [
