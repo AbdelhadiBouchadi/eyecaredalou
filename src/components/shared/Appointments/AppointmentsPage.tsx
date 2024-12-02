@@ -1,7 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Calendar, momentLocalizer, View } from 'react-big-calendar';
+import {
+  Calendar,
+  momentLocalizer,
+  ToolbarProps,
+  View,
+} from 'react-big-calendar';
 import moment from 'moment';
 import 'moment/locale/fr'; // Import French locale
 import { BiPlus } from 'react-icons/bi';
@@ -25,9 +30,9 @@ const AppointmentsPage: React.FC = () => {
     setData(undefined);
   };
 
-  const createService = (serviceData: any): Service => ({
-    id: serviceData.id,
-    name: serviceData.name,
+  const createService = (serviceData: Partial<Service>): Service => ({
+    id: serviceData.id!,
+    name: serviceData.name!,
     price: serviceData.price || 0,
     date: serviceData.date || new Date().toISOString(),
     status: serviceData.status || false,
@@ -117,7 +122,9 @@ const AppointmentsPage: React.FC = () => {
           },
         })}
         components={{
-          toolbar: CustomToolbar,
+          toolbar: CustomToolbar as React.ComponentType<
+            ToolbarProps<AppointmentData, object>
+          >,
         }}
         messages={{
           allDay: 'Toute la journée',

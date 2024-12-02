@@ -6,13 +6,13 @@ interface MenuItem {
   title: string;
   icon?: React.ElementType;
   path?: string; // Make path optional
-  onClick?: (data: any) => void; // Add onClick callback
+  onClick?: (data: MenuItem) => void; // Add onClick callback
 }
 
 interface MenuSelectProps {
   children: React.ReactNode;
   datas: MenuItem[];
-  item?: any; // Adjust this type according to the expected data type
+  item?: MenuItem[]; // Adjust this type according to the expected data type
 }
 
 const MenuSelect = ({ children, datas }: MenuSelectProps) => {

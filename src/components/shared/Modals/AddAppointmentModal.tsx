@@ -15,7 +15,6 @@ import { HiOutlineCheckCircle } from 'react-icons/hi';
 import { toast } from 'react-hot-toast';
 import PatientMedicineServiceModal from './PatientMedicineServiceModal';
 import { memberData, servicesData, sortsDatas } from '@/lib/data';
-import { useForm } from 'react-hook-form';
 
 // Types
 type Service = {
@@ -32,7 +31,7 @@ type Status = {
 };
 
 type Doctor = {
-  id: string;
+  id: string | number;
   name: string;
 };
 
@@ -67,17 +66,6 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   isOpen,
   datas,
 }) => {
-  // Inside your component
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-  const onSubmit = (data: any) => {
-    console.log(data);
-  };
-
   const [services, setServices] = useState<Service>({
     id: String(servicesData[0].id), // Convert id to string
     name: servicesData[0].name,
@@ -90,11 +78,7 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
     name: sortsDatas.status[0].name,
   });
   const [doctors, setDoctors] = useState<Doctor>(doctorsData[0]);
-  const [shares, setShares] = useState<Shares>({
-    email: false,
-    sms: false,
-    whatsapp: false,
-  });
+
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -102,14 +86,8 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
       setServices(datas.service);
       setStartTime(new Date(datas.start));
       setEndTime(new Date(datas.end));
-      setShares(datas.shareData);
     }
   }, [datas]);
-
-  const onChangeShare = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setShares((prev) => ({ ...prev, [name]: checked }));
-  };
 
   return (
     <Modal
@@ -139,7 +117,6 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
               }
               name="patientName" // Provide a name here
               type="text" // Specify the type of input (e.g., 'text', 'email', etc.)
-              register={register} // Pass the register function from react-hook-form, if needed
             />
           </div>
           <button

@@ -17,16 +17,8 @@ interface InputProps {
   type: string;
   color?: boolean;
   placeholder: string;
-  register?: any; // Adjust type if using React Hook Form
 }
-export function Input({
-  label,
-  name,
-  type,
-  color,
-  placeholder,
-  register,
-}: InputProps) {
+export function Input({ label, name, type, color, placeholder }: InputProps) {
   return (
     <div className="text-sm w-full">
       <label
@@ -38,7 +30,6 @@ export function Input({
       </label>
       <input
         name={name}
-        {...register}
         type={type}
         placeholder={placeholder}
         className={`w-full bg-transparent text-sm mt-3 p-4 border ${
@@ -77,14 +68,14 @@ export function Button({ label, onClick, loading, Icon }: ButtonProps) {
 
 type MenuItem = {
   title: string;
-  onClick: (data: any) => void;
+  onClick: (data: MenuItem) => void;
   icon?: React.ComponentType<{ className?: string }>; // Accepts a component with className prop
 };
 
 interface MenuSelectProps {
   children: React.ReactNode; // The content for the menu button
   datas: MenuItem[]; // Array of menu items
-  item: any; // Type of the data being passed (you can replace `any` with a specific type if known)
+  item: MenuItem; // Type of the data being passed (you can replace `any` with a specific type if known)
 }
 
 export function MenuSelect({ children, datas, item: data }: MenuSelectProps) {
@@ -112,33 +103,36 @@ export function MenuSelect({ children, datas, item: data }: MenuSelectProps) {
   );
 }
 
+type Person = {
+  id: string | number;
+  name: string;
+};
 // Select Component
-interface SelectProps<T> {
+interface SelectProps {
   children: ReactNode;
-  selectedPerson: T;
-  setSelectedPerson: (value: T) => void;
-  datas: T[];
+  selectedPerson: Person;
+  setSelectedPerson: (value: Person) => void;
+  datas: Person[];
 }
-export function Select<T>({
+export function Select({
   children,
   selectedPerson,
   setSelectedPerson,
   datas,
-}: SelectProps<T>) {
+}: SelectProps) {
   return (
     <div className="text-sm relative w-full">
       <div className="w-full">
         <Listbox value={selectedPerson} onChange={setSelectedPerson}>
           <Listbox.Button className="w-full">{children}</Listbox.Button>
           <Listbox.Options className="flex flex-col gap-4 top-10 z-50 absolute left-0 w-full bg-white rounded-md shadow-lg py-4 px-6 ring-1 ring-border focus:outline-none">
-            {datas.map((person) => (
+            {datas.map((person, index) => (
               <Listbox.Option
-                key={(person as any).id}
+                key={index}
                 value={person}
-                disabled={(person as any).unavailable}
                 className="cursor-pointer text-xs hover:text-subMain"
               >
-                {(person as any).name}
+                {person.name}
               </Listbox.Option>
             ))}
           </Listbox.Options>
@@ -176,14 +170,13 @@ export function Switchi({ checked, onChange }: SwitchProps) {
 interface TextareaProps {
   label: string;
   name?: string;
-  register?: any; // Adjust type if using React Hook Form
   placeholder: string;
   rows: number;
 }
 export function Textarea({
   label,
   name,
-  register,
+
   placeholder,
   rows,
 }: TextareaProps) {
@@ -193,7 +186,6 @@ export function Textarea({
       <textarea
         name={name}
         rows={rows}
-        {...register}
         placeholder={placeholder}
         className="focus:border-subMain w-full bg-transparent text-sm mt-3 p-4 border border-border rounded font-light"
       />

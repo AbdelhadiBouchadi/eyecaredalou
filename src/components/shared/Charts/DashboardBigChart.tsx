@@ -70,7 +70,7 @@ const DashboardBigChart = () => {
       enabled: false,
     },
     tooltip: {
-      custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+      custom: function ({ series, seriesIndex, dataPointIndex }) {
         return (
           '<div className="bg-white py-2 px-2 text-xs border-[.5px] border-border">' +
           'Total:' +

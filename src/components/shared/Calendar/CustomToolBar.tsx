@@ -1,17 +1,15 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { ToolbarProps, Navigate, momentLocalizer } from 'react-big-calendar';
+import { ToolbarProps, Navigate, View } from 'react-big-calendar';
 import moment from 'moment';
 import 'moment/locale/fr'; // Import French locale
 import { BiChevronLeft, BiChevronRight, BiTime } from 'react-icons/bi';
 import { HiOutlineViewGrid } from 'react-icons/hi';
 import { HiOutlineCalendarDays } from 'react-icons/hi2';
-import { ViewType } from '@/types/appointment';
 
-const CustomToolbar: React.FC<ToolbarProps<any>> = (toolbar) => {
+const CustomToolbar: React.FC<ToolbarProps> = (toolbar) => {
   moment.locale('fr');
-  const localizer = momentLocalizer(moment);
 
   // Set moment locale to French
   useEffect(() => {
@@ -30,18 +28,18 @@ const CustomToolbar: React.FC<ToolbarProps<any>> = (toolbar) => {
     toolbar.onNavigate(Navigate.TODAY);
   };
 
-  const goToView = (view: ViewType) => {
+  const goToView = (view: View) => {
     toolbar.onView(view);
   };
 
   const viewNamesGroup = [
-    { view: 'month' as ViewType, label: 'Month', icon: <HiOutlineViewGrid /> },
+    { view: 'month' as View, label: 'Month', icon: <HiOutlineViewGrid /> },
     {
-      view: 'week' as ViewType,
+      view: 'week' as View,
       label: 'Week',
       icon: <HiOutlineCalendarDays />,
     },
-    { view: 'day' as ViewType, label: 'Day', icon: <BiTime /> },
+    { view: 'day' as View, label: 'Day', icon: <BiTime /> },
   ];
 
   return (
@@ -53,7 +51,7 @@ const CustomToolbar: React.FC<ToolbarProps<any>> = (toolbar) => {
             onClick={goToCurrent}
             className="px-6 py-2 border border-subMain rounded-md text-subMain"
           >
-            Aujourd'hui
+            Aujourd&apos;hui
           </button>
         </div>
         <div className="md:col-span-9 flex justify-center items-center gap-4 capitalize">

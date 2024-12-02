@@ -16,5 +16,3 @@ export interface AppointmentData {
   service: Service;
   shareData: ShareData;
 }
-
-export type ViewType = 'month' | 'week' | 'day';
