@@ -240,6 +240,7 @@ input:focus, textarea:focus, select:focus,button:focus{
   padding: 10px 20px;
   text-transform: lowercase !important;
 }
+
 .react-datepicker-wrapper{
   display: block !important;
 }

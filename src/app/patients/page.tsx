@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@/components/shared/CustomBtn';
 import { FromToDate } from '@/components/shared/Patients/FromToDate';
 import { PatientTable } from '@/components/shared/Patients/PatientsTable';
 import { Select } from '@/components/shared/Patients/Select';

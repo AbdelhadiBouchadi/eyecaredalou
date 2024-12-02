@@ -1,6 +1,14 @@
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import './globals.css';
+import 'swiper/css';
+import 'aos';
+import 'aos/dist/aos.css';
+import 'react-tooltip/dist/react-tooltip.css';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import 'react-datepicker/dist/react-datepicker.css';
+import 'react-modern-drawer/dist/index.css';
 import Sidebar from '@/components/shared/Sidebar';
 import Header from '@/components/shared/Header';
 import { Toaster } from 'react-hot-toast';

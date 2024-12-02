@@ -67,6 +67,81 @@ export const MenuDatas = [
   },
 ];
 
+export const medicineData = [
+  {
+    id: 1,
+    name: 'Paracetamol',
+    measure: 'Tablet',
+    stock: 400,
+    price: 1000,
+    status: 'Available',
+    instraction: 'After meal',
+  },
+  {
+    id: 2,
+    name: 'Amoxicillin',
+    measure: 'Capsule',
+    stock: 200,
+    price: 2300,
+    status: 'Available',
+    instraction: 'After meal',
+  },
+  {
+    id: 3,
+    name: 'Ibuprofen',
+    measure: 'mm',
+    stock: 0,
+    price: 5000,
+    status: 'Out of stock',
+    instraction: 'Before meal',
+  },
+  {
+    id: 4,
+    name: 'Aspirin',
+    measure: 'cm',
+    stock: 370,
+    price: 3500,
+    status: 'Available',
+    instraction: 'After meal',
+  },
+  {
+    id: 5,
+    name: 'Diazepam',
+    measure: 'gm',
+    stock: 0,
+    price: 12000,
+    status: 'Out of stock',
+    instraction: 'Before meal',
+  },
+  {
+    id: 6,
+    name: 'Lorazepam',
+    measure: 'mg',
+    stock: 123,
+    price: 15500,
+    status: 'Available',
+    instraction: 'Before meal',
+  },
+  {
+    id: 7,
+    name: 'Codeine',
+    measure: 'ml',
+    stock: 1,
+    price: 30000,
+    status: 'Available',
+    instraction: 'After meal',
+  },
+  {
+    id: 8,
+    name: 'Tramadol',
+    measure: 'lb',
+    stock: 0,
+    price: 200,
+    status: 'Out of stock',
+    instraction: 'Before meal',
+  },
+];
+
 export const memberData = [
   {
     id: '1',
@@ -597,3 +672,579 @@ export const sortsDatas = {
     },
   ],
 };
+
+export const servicesData = [
+  {
+    id: 1,
+    name: 'Select service.. ',
+  },
+  {
+    id: 2,
+    name: 'Refractive Lens Exchange (RLE)',
+    price: 40000,
+    date: '23 June, 2021',
+    status: true,
+  },
+  {
+    id: 3,
+    name: 'Cataracts Surgery',
+    price: 20000,
+    date: '12 Jan, 2022',
+    status: true,
+  },
+  {
+    id: 4,
+    name: 'Lasik and Lasek (PRK)',
+    price: 50000,
+    date: '11 April, 2023',
+    status: false,
+  },
+  {
+    id: 5,
+    name: 'Implantable Contact Lens (ICL)',
+    price: 34000,
+    date: '10 Agst, 2021',
+    status: true,
+  },
+  {
+    id: 6,
+    name: 'Corneal Human Inlays (KeraNatural)',
+    price: 10400,
+    date: '23 June, 2021',
+    status: false,
+  },
+  {
+    id: 7,
+    name: 'Corneal Cross Linking (CXL)',
+    price: 150000,
+    date: '09 Dec, 2023',
+    status: false,
+  },
+  {
+    id: 8,
+    name: 'Dry Eye Treatment',
+    price: 23000,
+    date: '05 Feb, 2019',
+    status: true,
+  },
+  {
+    id: 9,
+    name: 'Amblyopia (Bynocs)',
+    price: 40000,
+    date: '16 Nov, 2022',
+    status: true,
+  },
+  {
+    id: 10,
+    name: 'Drooping Eyelids',
+    price: 19000,
+    date: '02 Jun, 2022',
+    status: false,
+  },
+  {
+    id: 11,
+    name: 'Paeditaric Ophthalmology',
+    price: 160000,
+    date: '23 June, 2021',
+    status: true,
+  },
+];
+
+export const patientTab = [
+  {
+    id: 1,
+    title: 'Medical Records',
+    icon: TbChartHistogram,
+  },
+  {
+    id: 2,
+    title: 'Appointments',
+    icon: BiCalendar,
+  },
+  {
+    id: 3,
+    title: 'Invoices',
+    icon: RiFileList3Line,
+  },
+  {
+    id: 4,
+    title: 'Payments',
+    icon: RiMoneyDollarCircleLine,
+  },
+  {
+    id: 5,
+    title: 'Images',
+    icon: RiImageLine,
+  },
+  {
+    id: 6,
+    title: 'Chart',
+    icon: RiStethoscopeLine,
+  },
+  {
+    id: 7,
+    title: 'Patient Information',
+    icon: RiUserLine,
+  },
+  {
+    id: 8,
+    title: 'Health Information',
+    icon: RiHeartLine,
+  },
+];
+
+export const doctorTab = [
+  {
+    id: 1,
+    title: 'Personal Information',
+    icon: RiUserLine,
+  },
+  {
+    id: 2,
+    title: 'Patients',
+    icon: BiUserPlus,
+  },
+  {
+    id: 3,
+    title: 'Appointments',
+    icon: BiCalendar,
+  },
+  {
+    id: 4,
+    title: 'Payments',
+    icon: RiMoneyDollarCircleLine,
+  },
+  {
+    id: 5,
+    title: 'Invoices',
+    icon: RiFileList3Line,
+  },
+  {
+    id: 6,
+    title: 'Reviews',
+    icon: MdOutlineReviews,
+  },
+  {
+    id: 7,
+    title: 'Access Control',
+    icon: TbLockAccess,
+  },
+  {
+    id: 8,
+    title: 'Change Password',
+    icon: RiLockPasswordLine,
+  },
+];
+
+export const medicalRecodData = [
+  {
+    id: 1,
+    date: '13, Jan 2021',
+    amount: 150000,
+    data: [
+      {
+        id: 1,
+        title: 'Complaint',
+        value: 'Sudden loss of vision,Red eyes,Double vision,Blurred vision',
+      },
+      {
+        id: 2,
+        title: 'Diagnosis',
+        value: 'High blood pressure, Diabetes, Hypertension',
+      },
+      {
+        id: 3,
+        title: 'Treatment',
+        value: 'Refractive Lens Exchange (RLE)',
+      },
+      {
+        id: 4,
+        title: 'Prescription',
+        value: 'Paracetamol, Amoxicillin, Ibuprofen, Aspirin',
+      },
+    ],
+    attachments: [
+      'https://placehold.it/300x300',
+      'https://placehold.it/300x300',
+      'https://placehold.it/300x300',
+      'https://placehold.it/300x300',
+    ],
+    vitalSigns: [
+      'Blood Pressure: 120/80 mmHg',
+      'Pulse Rate: 80 bpm',
+      'Respiratory Rate: 16 bpm',
+      'Temperature: 36.5 °C',
+      'Oxygen Saturation: 98%',
+    ],
+  },
+  {
+    id: 2,
+    date: '10, Feb 2022',
+    amount: 300000,
+    data: [
+      {
+        id: 1,
+        title: 'Complaint',
+        value: 'Flashing lights and floaters,Watery eyes,Painful vision',
+      },
+      {
+        id: 2,
+        title: 'Diagnosis',
+        value: 'High cholesterol,Rheumatoid arthritis',
+      },
+      {
+        id: 3,
+        title: 'Treatment',
+        value: 'Cataracts Surgery, Laser Eye Surgery',
+      },
+      {
+        id: 4,
+        title: 'Prescription',
+        value: 'Benzocaine, Lidocaine, Mepivacaine, Prilocaine',
+      },
+    ],
+    attachments: [
+      'https://placehold.it/300x300',
+      'https://placehold.it/300x300',
+      'https://placehold.it/300x300',
+      'https://placehold.it/300x300',
+    ],
+    vitalSigns: [
+      'Weight: 60 kg',
+      'Height: 170 cm',
+      'BMI: 20.76 kg/m2',
+      'Blood Pressure: 120/80 mmHg',
+    ],
+  },
+  {
+    id: 3,
+    date: '20, Mar 2022',
+    amount: 500000,
+    data: [
+      {
+        id: 1,
+        title: 'Complaint',
+        value: 'Painful eyes,Flashing lights and floaters,Blurred vision',
+      },
+      {
+        id: 2,
+        title: 'Diagnosis',
+        value: 'Cataracts, Glaucoma, Diabetic eye disease',
+      },
+      {
+        id: 3,
+        title: 'Treatment',
+        value: 'Paeditaric Ophthalmology,Drooping Eyelids, Laser Eye Surgery',
+      },
+      {
+        id: 4,
+        title: 'Prescription',
+        value: 'Gingival Gel, Chlorhexidine, Fluoride, Calcium',
+      },
+    ],
+    attachments: [
+      'https://placehold.it/300x300',
+      'https://placehold.it/300x300',
+      'https://placehold.it/300x300',
+      'https://placehold.it/300x300',
+    ],
+    vitalSigns: [
+      'Temperature: 36.5 °C',
+      'Oxygen Saturation: 98%',
+      'Blood Pressure: 120/80 mmHg',
+      'Pulse Rate: 80 bpm',
+      'Respiratory Rate: 16 bpm',
+    ],
+  },
+  {
+    id: 4,
+    date: '10, Apr 2022',
+    amount: 760000,
+    data: [
+      {
+        id: 1,
+        title: 'Complaint',
+        value: 'Gradual loss of vision,Headache,Vision problems',
+      },
+      {
+        id: 2,
+        title: 'Diagnosis',
+        value: 'Cataracts, Glaucoma, Diabetic eye disease, Hypertension',
+      },
+      {
+        id: 3,
+        title: 'Treatment',
+        value: 'Cataracts Surgery, Laser Eye Surgery, Paeditaric Ophthalmology',
+      },
+      {
+        id: 4,
+        title: 'Prescription',
+        value: 'Tramadol, Codeine, Morphine, Oxycodone',
+      },
+    ],
+    attachments: [
+      'https://placehold.it/300x300',
+      'https://placehold.it/300x300',
+      'https://placehold.it/300x300',
+      'https://placehold.it/300x300',
+    ],
+    vitalSigns: [
+      'Sugar Level: 120 mg/dL',
+      'Oxygen Saturation: 98%',
+      'Cholesterol: 200 mg/dL',
+      'Blood Pressure: 120/80 mmHg',
+    ],
+  },
+];
+
+export const doctorsData = [
+  {
+    id: 1,
+    user: memberData[0],
+    title: 'Dr.',
+  },
+  {
+    id: 2,
+    user: memberData[1],
+    title: 'Dr.',
+  },
+  {
+    id: 3,
+    user: memberData[2],
+    title: 'Dr.',
+  },
+  {
+    id: 4,
+    user: memberData[3],
+    title: 'Dr.',
+  },
+];
+
+export const receptionsData = [
+  {
+    id: 1,
+    user: memberData[6],
+    title: 'Dr.',
+  },
+  {
+    id: 2,
+    user: memberData[7],
+    title: 'Dr.',
+  },
+  {
+    id: 3,
+    user: memberData[5],
+    title: 'Dr.',
+  },
+  {
+    id: 4,
+    user: memberData[4],
+    title: 'Dr.',
+  },
+  {
+    id: 5,
+    user: memberData[2],
+    title: 'Dr.',
+  },
+  {
+    id: 6,
+    user: memberData[1],
+    title: 'Dr.',
+  },
+];
+
+export const patientImages = [
+  'https://res.cloudinary.com/ds5bmx4ee/image/upload/v1711607746/Eye%20Clinic%20Dashboard/2_g7b8yh.jpg',
+  'https://res.cloudinary.com/ds5bmx4ee/image/upload/v1711607745/Eye%20Clinic%20Dashboard/3_hz4vrd.webp',
+  'https://res.cloudinary.com/ds5bmx4ee/image/upload/v1711607746/Eye%20Clinic%20Dashboard/4_mpyrax.jpg',
+  'https://res.cloudinary.com/ds5bmx4ee/image/upload/v1711607748/Eye%20Clinic%20Dashboard/5_ezdsku.webp',
+  'https://res.cloudinary.com/ds5bmx4ee/image/upload/v1711607746/Eye%20Clinic%20Dashboard/6_iqoxxa.jpg',
+  'https://res.cloudinary.com/ds5bmx4ee/image/upload/v1711607746/Eye%20Clinic%20Dashboard/7_yg4sbv.jpg',
+  'https://res.cloudinary.com/ds5bmx4ee/image/upload/v1711607752/Eye%20Clinic%20Dashboard/8_joyhf7.png',
+  'https://res.cloudinary.com/ds5bmx4ee/image/upload/v1711607749/Eye%20Clinic%20Dashboard/9_zmsbil.jpg',
+  'https://res.cloudinary.com/ds5bmx4ee/image/upload/v1711607746/Eye%20Clinic%20Dashboard/1_uhqkrg.jpg',
+];
+
+export const chatsData = [
+  {
+    id: 1,
+    user: memberData[0],
+    active: '2 min ago',
+    status: true,
+    message: 'Appointment delay doctor..',
+  },
+  {
+    id: 2,
+    user: memberData[1],
+    active: '2:30 Pm',
+    status: true,
+    message: 'Can we have meeting now??',
+  },
+  {
+    id: 3,
+    user: memberData[2],
+    active: '1:30 Pm',
+    status: true,
+    message: 'i need your help doctor',
+  },
+  {
+    id: 4,
+    user: memberData[3],
+    active: 'Yesterday',
+    status: true,
+    message: 'How are you doing??',
+  },
+  {
+    id: 5,
+    user: memberData[4],
+    active: '12/4/2024',
+    status: false,
+    message: 'Delete all patient data',
+  },
+  {
+    id: 6,
+    user: memberData[5],
+    active: '11/4/2024',
+    status: false,
+    message: 'Hellow doctor..',
+  },
+  {
+    id: 7,
+    user: memberData[6],
+    active: '06/4/2024',
+    status: false,
+    message: 'Need your minute. are you available?    ',
+  },
+  {
+    id: 8,
+    user: memberData[7],
+    active: '05/3/2024',
+    status: false,
+    message: 'Morning.',
+  },
+
+  {
+    id: 9,
+    user: memberData[0],
+    active: '11/4/2024',
+    status: false,
+    message: 'Hellow doctor..',
+  },
+  {
+    id: 10,
+    user: memberData[3],
+    active: '06/4/2024',
+    status: false,
+    message: 'Need your minute. are you available?    ',
+  },
+  {
+    id: 11,
+    user: memberData[1],
+    active: '05/3/2024',
+    status: false,
+    message: 'Morning.',
+  },
+];
+
+export const convData = [
+  {
+    id: 1,
+    user: memberData[0],
+    text: 'Morning dr. Daudi 👐👐',
+    time: '12:00 PM',
+    imageUrl: '',
+    value: {
+      image: false,
+      me: false,
+    },
+  },
+  {
+    id: 2,
+    user: memberData[4],
+    text: 'Morning how are you doing',
+    time: '12:02 PM',
+    imageUrl: '',
+    value: {
+      image: false,
+      me: true,
+    },
+  },
+  {
+    id: 3,
+    user: memberData[0],
+    text: 'Im doing well.. is patient 23 room available',
+    time: '12:05 PM',
+    imageUrl: '',
+    value: {
+      image: false,
+      me: false,
+    },
+  },
+  {
+    id: 4,
+    user: memberData[0],
+    text: 'I need to make appointment with her',
+    time: '12:05 PM',
+    imageUrl: '',
+    value: {
+      image: false,
+      me: false,
+    },
+  },
+  {
+    id: 5,
+    user: memberData[4],
+    text: 'She is available dear..',
+    time: '01:06 PM',
+    imageUrl: '',
+    value: {
+      image: false,
+      me: true,
+    },
+  },
+  {
+    id: 6,
+    user: memberData[0],
+    text: 'Ohh thank you 😌😌😌',
+    time: '01:09 PM',
+    imageUrl: '',
+    value: {
+      image: false,
+      me: false,
+    },
+  },
+  {
+    id: 7,
+    user: memberData[4],
+    text: 'Check out her image...',
+    time: '01:14 PM',
+    imageUrl: '',
+    value: {
+      image: false,
+      me: true,
+    },
+  },
+  {
+    id: 8,
+    user: memberData[4],
+    text: '',
+    time: '01:14 PM',
+    imageUrl:
+      'https://res.cloudinary.com/ds5bmx4ee/image/upload/v1711607745/Eye%20Clinic%20Dashboard/3_hz4vrd.webp',
+    value: {
+      image: true,
+      me: true,
+    },
+  },
+  {
+    id: 9,
+    user: memberData[0],
+    text: 'I will check on her account 😌',
+    time: '01:18 PM',
+    imageUrl: '',
+    value: {
+      image: false,
+      me: false,
+    },
+  },
+];
