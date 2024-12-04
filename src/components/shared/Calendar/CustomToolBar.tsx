@@ -35,7 +35,7 @@ const CustomToolbar: React.FC<ToolbarProps> = (toolbar) => {
   const viewNamesGroup = [
     { view: 'month' as View, label: 'Month', icon: <HiOutlineViewGrid /> },
     {
-      view: 'week' as View,
+      view: 'work_week' as View,
       label: 'Week',
       icon: <HiOutlineCalendarDays />,
     },

@@ -105,7 +105,7 @@ const AppointmentsPage: React.FC = () => {
         timeslots={1}
         step={60}
         selectable
-        views={['month', 'day', 'week']}
+        views={['month', 'day', 'work_week']}
         eventPropGetter={(event) => ({
           style: {
             backgroundColor: event.color || '#07b8db',
