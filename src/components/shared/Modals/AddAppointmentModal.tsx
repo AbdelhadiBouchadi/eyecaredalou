@@ -93,7 +93,7 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
     <Modal
       closeModal={closeModal}
       isOpen={isOpen}
-      title={datas?.title ? 'Edit Appointment' : 'New Appointment'}
+      title={datas?.title ? 'Modifier Le Rendez-vous' : 'Créer un Rendez-vous'}
       width="max-w-3xl"
     >
       {open && (
@@ -108,12 +108,12 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
         <div className="grid sm:grid-cols-12 gap-4 w-full items-center">
           <div className="sm:col-span-10">
             <Input
-              label="Patient Name"
+              label="Nom du patient"
               color={true}
               placeholder={
                 datas?.title
                   ? datas.title
-                  : 'Select Patient and patient name will appear here'
+                  : 'Séléctionner le nom du patient et le nom du patient apparaitra ici'
               }
               name="patientName" // Provide a name here
               type="text" // Specify the type of input (e.g., 'text', 'email', etc.)
@@ -123,14 +123,14 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
             onClick={() => setOpen(true)}
             className="text-subMain flex-rows border border-dashed border-subMain text-sm py-3.5 sm:mt-6 sm:col-span-2 rounded"
           >
-            <BiPlus /> Add
+            <BiPlus /> Ajouter
           </button>
         </div>
 
         {/* Purpose and Date */}
         <div className="grid sm:grid-cols-2 gap-4 w-full">
           <div className="flex w-full flex-col gap-3">
-            <p className="text-black text-sm">Purpose of Visit</p>
+            <p className="text-black text-sm">Raison de la visite</p>
             <Select
               selectedPerson={services}
               setSelectedPerson={setServices}
@@ -142,7 +142,7 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
             </Select>
           </div>
           <DatePickerComp
-            label="Date of Visit"
+            label="Date de visite"
             startDate={startDate}
             onChange={setStartDate}
           />
@@ -151,12 +151,12 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
         {/* Time Selection */}
         <div className="grid sm:grid-cols-2 gap-4 w-full">
           <TimePickerComp
-            label="Start Time"
+            label="Début du rendez-vous"
             startDate={startTime}
             onChange={setStartTime}
           />
           <TimePickerComp
-            label="End Time"
+            label="Fin du rendez-vous"
             startDate={endTime}
             onChange={setEndTime}
           />
@@ -165,7 +165,7 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
         {/* Doctor and Status */}
         <div className="grid sm:grid-cols-2 gap-4 w-full">
           <div className="flex w-full flex-col gap-3">
-            <p className="text-black text-sm">Doctor</p>
+            <p className="text-black text-sm">Docteur</p>
             <Select
               selectedPerson={doctors}
               setSelectedPerson={setDoctors}
@@ -192,8 +192,10 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
 
         {/* Description */}
         <Textarea
-          label="Description"
-          placeholder={datas?.message || 'Add any additional details here'}
+          label="Déscription"
+          placeholder={
+            datas?.message || 'Ajoutez ici tous les détails supplémentaires'
+          }
           name="description"
           rows={5}
         />
@@ -204,10 +206,10 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
             onClick={closeModal}
             className="bg-red-600 bg-opacity-5 text-red-600 text-sm p-4 rounded-lg font-light"
           >
-            {datas?.title ? 'Discard' : 'Cancel'}
+            {datas?.title ? 'Discard' : 'Annuler'}
           </button>
           <Button
-            label="Save"
+            label="Sauvegarder"
             Icon={HiOutlineCheckCircle}
             onClick={() => toast.error('This feature is not available yet')}
           />

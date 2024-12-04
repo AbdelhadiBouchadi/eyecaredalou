@@ -56,7 +56,7 @@ const PatientMedicineServiceModal: React.FC<
     >
       <div className="flex-colo gap-6">
         <div className="flex items-center gap-4 w-full border border-border rounded-lg p-3">
-          <input type="text" placeholder="Search" className="w-full" />
+          <input type="text" placeholder="Rechercher ..." className="w-full" />
           <BiSearch className="text-xl" />
         </div>
 

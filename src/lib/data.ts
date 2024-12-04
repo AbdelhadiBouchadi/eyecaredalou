@@ -409,15 +409,15 @@ export const sortsDatas = {
     },
     {
       id: 2,
-      name: 'Pending',
+      name: 'En Attente',
     },
     {
       id: 3,
-      name: 'Approved',
+      name: 'Approuvé',
     },
     {
       id: 4,
-      name: 'Cancelled',
+      name: 'Annulé',
     },
   ],
   instractions: [
@@ -665,77 +665,42 @@ export const sortsDatas = {
 export const servicesData = [
   {
     id: 1,
-    name: 'Select service.. ',
+    name: 'Séléctionner un service... ',
   },
   {
     id: 2,
-    name: 'Refractive Lens Exchange (RLE)',
+    name: 'chirurgie de cataracte',
     price: 40000,
     date: '23 June, 2021',
     status: true,
   },
   {
     id: 3,
-    name: 'Cataracts Surgery',
+    name: 'chirurgie de retine',
     price: 20000,
     date: '12 Jan, 2022',
     status: true,
   },
   {
     id: 4,
-    name: 'Lasik and Lasek (PRK)',
+    name: 'chirurgie des annexes',
     price: 50000,
     date: '11 April, 2023',
     status: false,
   },
   {
     id: 5,
-    name: 'Implantable Contact Lens (ICL)',
+    name: 'chirugie de strabisme',
     price: 34000,
     date: '10 Agst, 2021',
     status: true,
   },
   {
     id: 6,
-    name: 'Corneal Human Inlays (KeraNatural)',
+    name: 'chirurgie de cataracte congenitale',
     price: 10400,
     date: '23 June, 2021',
     status: false,
-  },
-  {
-    id: 7,
-    name: 'Corneal Cross Linking (CXL)',
-    price: 150000,
-    date: '09 Dec, 2023',
-    status: false,
-  },
-  {
-    id: 8,
-    name: 'Dry Eye Treatment',
-    price: 23000,
-    date: '05 Feb, 2019',
-    status: true,
-  },
-  {
-    id: 9,
-    name: 'Amblyopia (Bynocs)',
-    price: 40000,
-    date: '16 Nov, 2022',
-    status: true,
-  },
-  {
-    id: 10,
-    name: 'Drooping Eyelids',
-    price: 19000,
-    date: '02 Jun, 2022',
-    status: false,
-  },
-  {
-    id: 11,
-    name: 'Paeditaric Ophthalmology',
-    price: 160000,
-    date: '23 June, 2021',
-    status: true,
   },
 ];
 
