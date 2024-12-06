@@ -65,7 +65,7 @@ const SignupForm = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="md:w-2/5 p-8 rounded-2xl mx-auto bg-white flex flex-col items-center"
+        className="md:w-2/5 p-8 rounded-2xl mx-auto bg-white flex flex-col items-center shadow-xl"
       >
         <img
           src="/images/logo.png"
