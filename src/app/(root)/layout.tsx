@@ -36,7 +36,7 @@ export default function RootLayout({
       <div className="col-span-10 xl:h-screen overflow-y-scroll relative">
         <Header />
         <div className="xs:px-8 px-2 pt-24">
-          <Toaster position="bottom-left" />
+          <Toaster position="top-left" />
           {children}
         </div>
       </div>
