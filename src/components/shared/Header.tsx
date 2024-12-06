@@ -24,7 +24,7 @@ function Header() {
     {
       title: 'Se déconnecter',
       icon: AiOutlinePoweroff,
-      path: '/logout',
+      path: '/sign-in',
     },
   ];
 

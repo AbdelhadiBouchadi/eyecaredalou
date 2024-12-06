@@ -13,7 +13,7 @@ registerLocale('fr', fr);
 // Input Component
 interface InputProps {
   label: string;
-  name: string;
+  name?: string;
   type: string;
   color?: boolean;
   placeholder: string;
@@ -29,7 +29,7 @@ export function Input({ label, name, type, color, placeholder }: InputProps) {
         {label}
       </label>
       <input
-        name={name}
+        name={name ? name : label}
         type={type}
         placeholder={placeholder}
         className={`w-full bg-transparent text-sm mt-3 p-4 border ${
