@@ -6,7 +6,7 @@ import { AuthError } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { comparePasswords, saltAndHashPassword } from '../utils';
 
-const getUserByEmail = async (email: string) => {
+export const getUserByEmail = async (email: string) => {
   try {
     const user = await db.user.findUnique({
       where: {

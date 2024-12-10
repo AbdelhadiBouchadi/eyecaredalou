@@ -18,9 +18,11 @@ import toast from 'react-hot-toast';
 import { useState } from 'react';
 import { BiLogInCircle } from 'react-icons/bi';
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
 
 const SignInForm = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const form = useForm({
     resolver: zodResolver(loginFormSchema), // Use the sign-in schema for validation
@@ -53,6 +55,8 @@ const SignInForm = () => {
       setIsLoading(false);
     }
   }
+
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   return (
     <Form {...form}>
@@ -91,12 +95,25 @@ const SignInForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input
-                    {...field}
-                    type="password"
-                    placeholder="Mot de passe"
-                    className="shad-input "
-                  />
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Mot de passe"
+                      className="shad-input pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-500" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-500" />
+                      )}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

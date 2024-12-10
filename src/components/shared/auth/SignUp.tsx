@@ -18,9 +18,12 @@ import { useState } from 'react';
 import { registerUser } from '@/lib/actions/auth';
 import { BiUserPlus } from 'react-icons/bi';
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
 
 const SignupForm = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
   const form = useForm({
     resolver: zodResolver(signupFormSchema),
@@ -60,6 +63,10 @@ const SignupForm = () => {
       );
     }
   }
+
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const toggleConfirmPasswordVisibility = () =>
+    setShowConfirmPassword(!showConfirmPassword);
 
   return (
     <Form {...form}>
@@ -113,12 +120,25 @@ const SignupForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input
-                    {...field}
-                    type="password"
-                    placeholder="Mot De Passe"
-                    className="shad-input"
-                  />
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Mot de passe"
+                      className="shad-input pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={togglePasswordVisibility}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-500" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-500" />
+                      )}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -131,12 +151,25 @@ const SignupForm = () => {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input
-                    {...field}
-                    type="password"
-                    placeholder="Confirmer le mot de passe"
-                    className="shad-input"
-                  />
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      placeholder="Confirmer le mot de passe"
+                      className="shad-input pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={toggleConfirmPasswordVisibility}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5 text-gray-500" />
+                      ) : (
+                        <Eye className="h-5 w-5 text-gray-500" />
+                      )}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
