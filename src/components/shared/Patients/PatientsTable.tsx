@@ -1,6 +1,8 @@
 import { FiEye } from 'react-icons/fi';
 import Link from 'next/link';
 import { Button } from '../CustomBtn';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 // Define interfaces for the props
 interface PatientData {
@@ -94,17 +96,16 @@ export const PatientTable: React.FC<PatientTableProps> = ({ data, used }) => {
               </>
             )}
             <td className={tdClass}>
-              {DropDown1.map((action, index) => (
-                <Link key={index} href={`/patients/preview/${item.id}`}>
-                  <Button
-                    label={action.title}
-                    Icon={action.icon}
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent row click
-                    }}
-                  />
-                </Link>
-              ))}
+              <Link
+                href="/patients/preview"
+                className={cn(
+                  buttonVariants({ variant: 'outline' }),
+                  'flex items-center gap-2 bg-subMain text-white'
+                )}
+              >
+                Voir
+                <FiEye className="text-xl" />
+              </Link>
             </td>
           </tr>
         ))}

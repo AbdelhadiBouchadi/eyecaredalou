@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment, ReactNode } from 'react';
 import { FaTimes } from 'react-icons/fa';
@@ -53,12 +54,12 @@ export default function Modal({
               >
                 <div className="w-full flex justify-between items-center gap-2 mb-8">
                   <h1 className="text-md font-semibold">{title}</h1>
-                  <button
+                  <Button
                     onClick={closeModal}
-                    className="w-14 h-12 bg-dry text-red-600 rounded-md flex justify-center items-center"
+                    className="size-10 bg-background hover:bg-red-600 hover:bg-opacity-5 text-red-600 rounded-md flex justify-center items-center"
                   >
                     <FaTimes />
-                  </button>
+                  </Button>
                 </div>
                 {children}
               </Dialog.Panel>

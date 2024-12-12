@@ -205,14 +205,14 @@ export function DatePickerComp({
   onChange,
 }: DatePickerProps) {
   return (
-    <div className="text-sm w-full">
+    <div className="text-sm w-full flex flex-col gap-3">
       <label className="text-black text-sm">{label}</label>
       <DatePicker
         locale={fr}
         selected={startDate}
         onChange={onChange}
         dateFormat="dd/MM/yyyy"
-        className="w-full bg-transparent text-sm mt-3 p-4 border border-border font-light rounded-lg focus:border focus:border-subMain"
+        className="w-full bg-transparent text-sm py-4 px-3 border border-border font-light rounded-lg focus:border focus:border-subMain shadow-sm focus-visible:outline-none focus-visible:ring-1"
       />
     </div>
   );
@@ -241,7 +241,7 @@ export function TimePickerComp({
         timeIntervals={30}
         timeCaption="Time"
         dateFormat="h:mm aa"
-        className="w-full bg-transparent text-sm mt-3 p-4 border border-border font-light rounded-lg focus:border focus:border-subMain"
+        className="w-full bg-transparent text-sm mt-3 p-4 border border-border font-light rounded-lg focus:border focus:border-subMain shadow-sm focus-visible:outline-none focus-visible:ring-1"
       />
     </div>
   );

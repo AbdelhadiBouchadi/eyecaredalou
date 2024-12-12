@@ -206,7 +206,7 @@ body {
   }
 }
 
-@layer utilities{
+@layer utilities {
   /* shadcn overrides */
   .login-btn {
     @apply w-full flex justify-center items-center gap-4 hover:opacity-80 transition bg-subMain text-white text-sm font-medium px-2 py-6 rounded !important;
@@ -218,6 +218,14 @@ body {
 
   .shad-label {
     @apply text-black text-sm !important;
+  }
+
+  .shad-select-trigger {
+    @apply bg-transparent  placeholder:text-gray-700 hover:text-subMain h-[3.35rem] focus:ring-0 focus:ring-offset-0 rounded-lg !important;
+  }
+
+  .shad-select-content {
+    @apply bg-dry border-subMain text-gray-900 !important;
   }
 }
 

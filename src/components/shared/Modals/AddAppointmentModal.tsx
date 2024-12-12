@@ -2,19 +2,19 @@
 
 import React, { useEffect, useState } from 'react';
 import Modal from './Modal';
-import {
-  Button,
-  DatePickerComp,
-  Input,
-  Select,
-  Textarea,
-  TimePickerComp,
-} from '../Form';
+import { DatePickerComp, Select, TimePickerComp } from '../Form';
 import { BiChevronDown, BiPlus } from 'react-icons/bi';
 import { HiOutlineCheckCircle } from 'react-icons/hi';
 import { toast } from 'react-hot-toast';
 import PatientMedicineServiceModal from './PatientMedicineServiceModal';
 import { memberData, servicesData, sortsDatas } from '@/lib/data';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import DropDown from '../Patients/DropDown';
+import SelectDoctor from './SelectDoctor';
+import SelectStatus from './SelectStatus';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 // Types
 type Service = {
@@ -35,18 +35,11 @@ type Doctor = {
   name: string;
 };
 
-type Shares = {
-  email: boolean;
-  sms: boolean;
-  whatsapp: boolean;
-};
-
 interface AppointmentData {
   title?: string;
   service: Service;
   start: Date;
   end: Date;
-  shareData: Shares;
   message?: string;
 }
 
@@ -106,40 +99,25 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
       <div className="flex-colo gap-6">
         {/* Patient Name and Add Button */}
         <div className="grid sm:grid-cols-12 gap-4 w-full items-center">
-          <div className="sm:col-span-10">
+          <div className="sm:col-span-12 flex justify-center items-center w-full gap-3">
             <Input
-              label="Nom du patient"
-              color={true}
-              placeholder={
-                datas?.title
-                  ? datas.title
-                  : 'Séléctionner le nom du patient et le nom du patient apparaitra ici'
-              }
-              name="patientName" // Provide a name here
-              type="text" // Specify the type of input (e.g., 'text', 'email', etc.)
+              placeholder="Nom du patient"
+              className="shad-input sm:col-span-10 "
             />
+            <Button
+              onClick={() => setOpen(true)}
+              className="text-white bg-subMain hover:bg-background hover:text-subMain h-full flex-rows text-sm py-3.5 mt-3 sm:col-span-2 rounded-lg"
+            >
+              <BiPlus className="text-xl" /> Ajouter
+            </Button>
           </div>
-          <button
-            onClick={() => setOpen(true)}
-            className="text-subMain flex-rows border border-dashed border-subMain text-sm py-3.5 sm:mt-6 sm:col-span-2 rounded"
-          >
-            <BiPlus /> Ajouter
-          </button>
         </div>
 
         {/* Purpose and Date */}
         <div className="grid sm:grid-cols-2 gap-4 w-full">
           <div className="flex w-full flex-col gap-3">
             <p className="text-black text-sm">Raison de la visite</p>
-            <Select
-              selectedPerson={services}
-              setSelectedPerson={setServices}
-              datas={servicesData}
-            >
-              <div className="w-full flex-btn text-textGray text-sm p-4 border border-border font-light rounded-lg focus:border focus:border-subMain">
-                {services.name} <BiChevronDown className="text-xl" />
-              </div>
-            </Select>
+            <DropDown onChangeHandler={() => ''} value="" />
           </div>
           <DatePickerComp
             label="Date de visite"
@@ -166,53 +144,35 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
         <div className="grid sm:grid-cols-2 gap-4 w-full">
           <div className="flex w-full flex-col gap-3">
             <p className="text-black text-sm">Docteur</p>
-            <Select
-              selectedPerson={doctors}
-              setSelectedPerson={setDoctors}
-              datas={doctorsData}
-            >
-              <div className="w-full flex-btn text-textGray text-sm p-4 border border-border font-light rounded-lg focus:border focus:border-subMain">
-                {doctors.name} <BiChevronDown className="text-xl" />
-              </div>
-            </Select>
+            <SelectDoctor onChangeHandler={() => ''} value="" />
           </div>
           <div className="flex w-full flex-col gap-3">
             <p className="text-black text-sm">Status</p>
-            <Select
-              selectedPerson={status}
-              setSelectedPerson={setStatus}
-              datas={sortsDatas.status}
-            >
-              <div className="w-full flex-btn text-textGray text-sm p-4 border border-border font-light rounded-lg focus:border focus:border-subMain">
-                {status.name} <BiChevronDown className="text-xl" />
-              </div>
-            </Select>
+            <SelectStatus onChangeHandler={() => ''} value="" />
           </div>
         </div>
 
         {/* Description */}
-        <Textarea
-          label="Déscription"
-          placeholder={
-            datas?.message || 'Ajoutez ici tous les détails supplémentaires'
-          }
-          name="description"
-          rows={5}
-        />
+        <div className="w-full flex flex-col gap-3">
+          <Label className="text-start text-sm">Déscription</Label>
+          <Textarea rows={5} />
+        </div>
 
         {/* Buttons */}
         <div className="grid sm:grid-cols-2 gap-4 w-full">
-          <button
+          <Button
             onClick={closeModal}
-            className="bg-red-600 bg-opacity-5 text-red-600 text-sm p-4 rounded-lg font-light"
+            className="bg-red-600 hover:bg-red-900 hover:bg-background hover:text-red-600 text-white text-sm p-4 rounded-lg font-normal"
           >
             {datas?.title ? 'Discard' : 'Annuler'}
-          </button>
+          </Button>
           <Button
-            label="Sauvegarder"
-            Icon={HiOutlineCheckCircle}
             onClick={() => toast.error('This feature is not available yet')}
-          />
+            className="bg-subMain hover:bg-background hover:text-subMain text-white text-sm p-4 rounded-lg font-normal flex justify-center items-center gap-3"
+          >
+            Sauvegarder
+            <HiOutlineCheckCircle className="text-xl" />
+          </Button>
         </div>
       </div>
     </Modal>

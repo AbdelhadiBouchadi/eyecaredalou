@@ -11,6 +11,7 @@ import { BsCalendarMonth } from 'react-icons/bs';
 import { MdOutlineCalendarMonth } from 'react-icons/md';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import DropDown from './DropDown';
 
 const PatientsPage = () => {
   useEffect(() => {
@@ -109,28 +110,8 @@ const PatientsPage = () => {
         data-aos-offset="200"
         className="bg-white my-8 rounded-xl border-[1px] border-border p-5"
       >
-        <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-2">
-          {/* sort  */}
-          {sorts.map((item) => (
-            <Select
-              key={item.id}
-              selectedPerson={item.selected}
-              setSelectedPerson={item.setSelected}
-              datas={item.datas}
-            >
-              <div className="h-14 w-full text-xs text-main rounded-md bg-dry border border-border px-4 flex items-center justify-between">
-                <p>{item.selected.name}</p>
-                <BiChevronDown className="text-xl" />
-              </div>
-            </Select>
-          ))}
-          {/* date */}
-          <FromToDate
-            startDate={startDate}
-            endDate={endDate}
-            bg="bg-dry"
-            onChange={(update) => setDateRange(update)}
-          />
+        <div className="grid grid-cols-1 xs:grid-cols-2 gap-2">
+          <DropDown onChangeHandler={() => ''} value="retine" />
         </div>
         <div className="mt-8 w-full overflow-x-scroll">
           <PatientTable data={memberData} used={false} />

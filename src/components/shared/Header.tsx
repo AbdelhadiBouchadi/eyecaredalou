@@ -6,27 +6,18 @@ import { AiOutlinePoweroff } from 'react-icons/ai';
 import { BiMenu } from 'react-icons/bi';
 import MenuDrawer from './MenuDrawer';
 import MenuSelect from './MenuSelect';
+import { useSession } from 'next-auth/react';
+import { logout } from '@/lib/actions/auth';
+import ProfileMenu from './ProfileMenu';
 
 function Header() {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { data: session } = useSession();
 
   // toggle drawer
   const toggleDrawer = () => {
     setIsOpen((prevState) => !prevState);
   };
-
-  const DropDown1 = [
-    {
-      title: 'Profile',
-      icon: TbUser,
-      path: '/settings',
-    },
-    {
-      title: 'Se déconnecter',
-      icon: AiOutlinePoweroff,
-      path: '/sign-in',
-    },
-  ];
 
   return (
     <>
@@ -51,7 +42,7 @@ function Header() {
         <div className="md:col-span-1 sm:col-span-1 col-span-2 items-center justify-end pr-4 md:pr-0">
           <div className="float-right flex gap-4 items-center justify-center">
             <div className=" items-center md:flex hidden">
-              <MenuSelect datas={DropDown1}>
+              <ProfileMenu>
                 <div className="flex gap-4 items-center p-4 rounded-lg">
                   <img
                     src="/images/user7.png"
@@ -59,10 +50,10 @@ function Header() {
                     className="w-12 border border-border object-cover h-12 rounded-full"
                   />
                   <p className="text-sm text-textGray font-medium">
-                    Dr. Anas Dalou
+                    {session?.user?.name}
                   </p>
                 </div>
-              </MenuSelect>
+              </ProfileMenu>
             </div>
           </div>
         </div>
