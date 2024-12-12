@@ -32,12 +32,12 @@ const HomePage = () => {
         {dashboardCards.map((card, index) => (
           <div
             key={card.id}
-            className=" bg-white rounded-xl border-[1px] border-border p-5"
+            className=" bg-white rounded-xl border-[1px] border-border p-5 shadow-sm"
           >
             <div className="flex gap-4 items-center">
               <div
                 className={cn(
-                  'w-10 h-10 flex-colo bg-opacity-10 rounded-md ',
+                  'w-10 h-10 flex-colo bg-opacity-10 rounded-md shadow-md ',
                   index === 0 ? 'bg-subMain text-subMain' : '',
                   index === 1 ? 'bg-yellow-500 text-yellow-500' : '',
                   index === 2 ? 'bg-[#66B5A3] text-[#66B5A3]' : ''
@@ -47,7 +47,7 @@ const HomePage = () => {
               </div>
               <h2 className="text-sm font-medium">{card.title}</h2>
             </div>
-            <div className="grid grid-cols-8 gap-4 mt-4 bg-dry py-5 px-8 items-center rounded-xl">
+            <div className="grid grid-cols-8 gap-4 mt-4 bg-dry py-5 px-8 items-center rounded-xl shadow-md">
               <div className="col-span-5">
                 {/* statistc */}
                 <DashboardSmallChart data={card.datas} colors={card.color[2]} />
@@ -76,10 +76,10 @@ const HomePage = () => {
       <div className="w-full my-6 grid xl:grid-cols-8 grid-cols-1 gap-6">
         <div className="xl:col-span-8  w-full">
           {/* eye banner */}
-          <div className=" bg-white rounded-xl border-[1px] border-border relative xl:mt-6">
+          <div className=" bg-white rounded-xl border-[1px] border-border relative xl:mt-6 overflow-hidden">
             <img
               src="/images/banner.avif"
-              className="w-full h-72 object-cover rounded"
+              className="w-full h-72 object-cover"
               alt="banner"
             />
             <div className="space-y-4 py-5 md:px-12 px-6 absolute top-0 bottom-0 left-0 right-0 bg-subMain bg-opacity-10 flex flex-col justify-center">
@@ -95,7 +95,7 @@ const HomePage = () => {
           </div>
           <div className="mt-6 bg-white rounded-xl border-[1px] border-border p-5">
             <div className="flex-btn gap-2">
-              <h2 className="text-sm font-medium">Earning Reports</h2>
+              <h2 className="text-sm font-medium">Statisques Annuels</h2>
               <p className="flex gap-4 text-sm items-center">
                 5.44%{' '}
                 <span className="py-1 px-2 bg-subMain text-white text-xs rounded-xl">

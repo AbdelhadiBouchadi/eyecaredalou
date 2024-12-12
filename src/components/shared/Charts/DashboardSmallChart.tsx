@@ -62,7 +62,7 @@ const DashboardSmallChart = ({ data, colors }: DashboardSmallChartProps) => {
     },
     tooltip: {
       custom: function ({ series, seriesIndex, dataPointIndex }) {
-        return `<div class="bg-white py-2 px-2 text-xs border-[.5px] border-border"> 
+        return `<div class="bg-white py-2 px-2 text-xs border-[.5px] border-border shadow-sm"> 
                  Total: <span class="font-semibold"> ${series[seriesIndex][dataPointIndex]} </span>
                </div>`;
       },
@@ -93,7 +93,7 @@ const DashboardSmallChart = ({ data, colors }: DashboardSmallChartProps) => {
       series={series}
       type="bar"
       width="100%"
-      height={50}
+      height={70}
     />
   );
 };

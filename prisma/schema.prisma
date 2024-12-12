@@ -96,11 +96,8 @@ model Authenticator {
 
 model Patient {
     id                String   @id @default(auto()) @map("_id") @db.ObjectId
-    title             String
-    image             String
-    admin             Boolean  @default(false)
-    email             String   @unique
-    phone             String
+    name              String
+    profileImage      String
     age               Int
     gender            String
     blood             String
