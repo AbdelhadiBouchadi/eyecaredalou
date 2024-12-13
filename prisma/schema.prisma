@@ -17,6 +17,31 @@ enum UserRole {
     DOCTOR
     RECEPTIONIST
     VISITOR
+    ADMIN
+}
+
+enum Gender {
+    MALE
+    FEMALE
+    OTHER
+}
+
+enum BloodGroup {
+    A_POSITIVE
+    A_NEGATIVE
+    B_POSITIVE
+    B_NEGATIVE
+    O_POSITIVE
+    O_NEGATIVE
+    AB_POSITIVE
+    AB_NEGATIVE
+}
+
+enum AppointmentStatus {
+    PENDING
+    APPROVED
+    CANCELED
+    COMPLETED
 }
 
 model User {
@@ -29,8 +54,10 @@ model User {
     accounts       Account[]
     sessions       Session[]
     role           UserRole?       @default(VISITOR)
-    // Optional for WebAuthn support
     Authenticator  Authenticator[]
+    // Doctor-specific fields
+    specialization String?
+    appointments   Appointment[]   @relation("DoctorAppointments")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -95,12 +122,90 @@ model Authenticator {
 }
 
 model Patient {
-    id                String   @id @default(auto()) @map("_id") @db.ObjectId
-    name              String
-    profileImage      String
-    age               Int
-    gender            String
-    blood             String
-    totalAppointments Int
-    date              DateTime
+    id           String     @id @default(auto()) @map("_id") @db.ObjectId
+    fullName     String
+    profileImage String?
+    age          Int
+    gender       Gender
+    bloodGroup   BloodGroup
+    createdAt    DateTime   @default(now())
+    updatedAt    DateTime   @updatedAt
+
+    // Medical Information
+    medicalRecords MedicalRecord[]
+    appointments   Appointment[]
+    eyeImages      EyeImage[]
+
+    // Health Information
+    allergies      String[]
+    habits         PatientHabit[]
+    medicalHistory MedicalHistory[]
+
+    // Stats
+    totalAppointments Int @default(0)
+}
+
+model PatientHabit {
+    id        String    @id @default(auto()) @map("_id") @db.ObjectId
+    patientId String    @db.ObjectId
+    habit     String // e.g., "Smoking", "Alcohol"
+    frequency String // e.g., "Daily", "Occasional"
+    details   String?
+    startDate DateTime?
+    endDate   DateTime?
+
+    patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+}
+
+model MedicalHistory {
+    id        String   @id @default(auto()) @map("_id") @db.ObjectId
+    patientId String   @db.ObjectId
+    condition String
+    diagnosis DateTime
+    treatment String?
+    notes     String?
+
+    patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+}
+
+model MedicalRecord {
+    id           String   @id @default(auto()) @map("_id") @db.ObjectId
+    patientId    String   @db.ObjectId
+    date         DateTime @default(now())
+    complaint    String
+    diagnosis    String
+    treatment    String
+    prescription String?
+    notes        String?
+
+    patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+}
+
+model EyeImage {
+    id          String   @id @default(auto()) @map("_id") @db.ObjectId
+    patientId   String   @db.ObjectId
+    imageUrl    String
+    date        DateTime @default(now())
+    description String?
+    type        String // e.g., "Left Eye", "Right Eye"
+
+    patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+}
+
+model Appointment {
+    id          String            @id @default(auto()) @map("_id") @db.ObjectId
+    patientId   String            @db.ObjectId
+    doctorId    String            @db.ObjectId
+    date        DateTime
+    startTime   DateTime
+    endTime     DateTime
+    status      AppointmentStatus @default(PENDING)
+    service     String // Purpose of visit
+    description String?
+
+    patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+    doctor  User    @relation("DoctorAppointments", fields: [doctorId], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
