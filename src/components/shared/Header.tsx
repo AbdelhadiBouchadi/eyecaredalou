@@ -32,11 +32,6 @@ function Header({ user }: HeaderProps) {
           >
             <BiMenu />
           </button>
-          <input
-            type="text"
-            placeholder='Search "Patients"'
-            className="md:w-96 w-full h-12 text-sm text-main rounded-md bg-dry border border-border px-4"
-          />
         </div>
         <div className="md:col-span-1 col-span-2 items-center justify-end md:pr-0">
           <div className="float-right flex gap-4 items-center justify-center">
