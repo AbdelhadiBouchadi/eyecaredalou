@@ -1,22 +1,47 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Eye, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { Appointment } from '@prisma/client';
+import { Appointment, User } from '@prisma/client';
+import { getAppointmentsByPatientId } from '@/lib/actions/appointment';
+import BigLoader from '../../Loading/BigLoader';
+
+interface AppointmentWithRelations extends Appointment {
+  doctor: User;
+}
 
 interface AppointmentsTabProps {
   patientId: string;
-  appointments?: Appointment[];
 }
 
-export function AppointmentsTab({
-  patientId,
-  appointments = [],
-}: AppointmentsTabProps) {
+export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [appointments, setAppointments] = useState<AppointmentWithRelations[]>(
+    []
+  );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchAppointments() {
+      try {
+        const patientAppointments = await getAppointmentsByPatientId(patientId);
+        setAppointments(patientAppointments as AppointmentWithRelations[]);
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAppointments();
+  }, [patientId]);
+
+  if (loading) {
+    return <BigLoader />;
+  }
 
   if (appointments.length === 0) {
     return (
@@ -68,7 +93,7 @@ export function AppointmentsTab({
                 Docteur
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">
-                Service
+                Type
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">
                 Status
@@ -88,11 +113,13 @@ export function AppointmentsTab({
                   {format(new Date(appointment.startTime), 'p')}
                 </td>
                 <td className="px-4 py-4 text-sm text-gray-900">
-                  Dr. John Doe{' '}
-                  {/* This should be replaced with actual doctor data */}
+                  {appointment.doctor?.name || 'N/A'}
                 </td>
                 <td className="px-4 py-4 text-sm text-gray-900">
-                  {appointment.service}
+                  {appointment.consultationType}
+                  {appointment.specializedConsultation &&
+                    ` - ${appointment.specializedConsultation}`}
+                  {appointment.surgeryType && ` - ${appointment.surgeryType}`}
                 </td>
                 <td className="px-4 py-4 text-sm">
                   <span
@@ -117,7 +144,7 @@ export function AppointmentsTab({
                     className="flex items-center gap-2"
                   >
                     <Eye className="w-4 h-4" />
-                    View
+                    Voir
                   </Button>
                 </td>
               </tr>

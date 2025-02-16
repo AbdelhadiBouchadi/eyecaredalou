@@ -133,6 +133,28 @@ export async function getAppointmentById(id: string) {
   }
 }
 
+export async function getAppointmentsByPatientId(patientId: string) {
+  try {
+    const appointments = await db.appointment.findMany({
+      where: {
+        patientId,
+      },
+      orderBy: {
+        date: 'desc',
+      },
+      include: {
+        patient: true,
+        doctor: true,
+      },
+    });
+
+    return appointments;
+  } catch (error) {
+    console.error('Error fetching appointments by patient ID:', error);
+    throw error;
+  }
+}
+
 export async function deleteAppointment(id: string) {
   try {
     const appointment = await db.appointment.delete({

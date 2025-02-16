@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-big-calendar';
 import moment from 'moment';
-import 'moment/locale/fr'; // Import French locale
+import 'moment/locale/fr';
 import { BiPlus } from 'react-icons/bi';
 import AddAppointmentModal from '@/components/shared/Modals/AddAppointmentModal';
 import CustomToolbar from '@/components/shared/Calendar/CustomToolBar';
@@ -67,7 +67,6 @@ const AppointmentsPage: React.FC = () => {
 
   const handleEventClick = (event: CalendarEvent) => {
     const appointment = event.resource;
-    // Convert Appointment to AppointmentFormValues
     const formValues: AppointmentFormValues & { id: string } = {
       id: appointment.id,
       patientId: appointment.patientId,
@@ -86,31 +85,55 @@ const AppointmentsPage: React.FC = () => {
     setOpen(true);
   };
 
-  const events: CalendarEvent[] = appointments.map((appointment) => ({
-    id: appointment.id,
-    title: `${appointment.patient?.fullName || 'Patient'} 
-    `,
-    start: new Date(appointment.startTime),
-    end: new Date(appointment.endTime),
-    color: 'black',
-    resource: appointment,
-  }));
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'PENDING':
+        return '#FFA500'; // Orange
+      case 'APPROVED':
+        return '#4CAF50'; // Green
+      case 'CANCELED':
+        return '#F44336'; // Red
+      case 'COMPLETED':
+        return '#2196F3'; // Blue
+      default:
+        return '#07b8db'; // Default color
+    }
+  };
 
-  // // Get color based on appointment status
-  // const getStatusColor = (status: string) => {
-  //   switch (status) {
-  //     case 'PENDING':
-  //       return '#FFA500'; // Orange
-  //     case 'APPROVED':
-  //       return '#4CAF50'; // Green
-  //     case 'CANCELED':
-  //       return '#F44336'; // Red
-  //     case 'COMPLETED':
-  //       return '#2196F3'; // Blue
-  //     default:
-  //       return '#07b8db'; // Default color
-  //   }
-  // };
+  const events: CalendarEvent[] = appointments.map((appointment) => {
+    // Create a Date object from the appointment date
+    const appointmentDate = new Date(appointment.date);
+
+    // Get hours and minutes from startTime and endTime
+    const startTime = new Date(appointment.startTime);
+    const endTime = new Date(appointment.endTime);
+
+    // Create new Date objects for start and end by combining the appointment date with time
+    const start = new Date(
+      appointmentDate.getFullYear(),
+      appointmentDate.getMonth(),
+      appointmentDate.getDate(),
+      startTime.getHours(),
+      startTime.getMinutes()
+    );
+
+    const end = new Date(
+      appointmentDate.getFullYear(),
+      appointmentDate.getMonth(),
+      appointmentDate.getDate(),
+      endTime.getHours(),
+      endTime.getMinutes()
+    );
+
+    return {
+      id: appointment.id,
+      title: `${appointment.patient?.fullName || 'Patient'}`,
+      start,
+      end,
+      color: getStatusColor(appointment.status),
+      resource: appointment,
+    };
+  });
 
   if (loading) {
     return <BigLoader />;
@@ -128,7 +151,7 @@ const AppointmentsPage: React.FC = () => {
       )}
       <button
         onClick={() => setOpen(true)}
-        className="w-16  h-16 border border-border z-50 bg-subMain text-white rounded-full flex-colo fixed bottom-8 right-12 button-fb"
+        className="w-16 h-16 border border-border z-50 bg-subMain text-white rounded-full flex-colo fixed bottom-8 right-12 button-fb"
       >
         <BiPlus className="text-2xl" />
       </button>
@@ -149,7 +172,7 @@ const AppointmentsPage: React.FC = () => {
         views={['month', 'day', 'work_week']}
         eventPropGetter={(event) => ({
           style: {
-            backgroundColor: 'black',
+            backgroundColor: event.color,
             borderRadius: '10px',
             color: 'white',
             border: '1px solid #F2FAF8',
