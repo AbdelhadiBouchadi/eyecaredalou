@@ -8,6 +8,14 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { Appointment, User } from '@prisma/client';
 import { getAppointmentsByPatientId } from '@/lib/actions/appointment';
 import BigLoader from '../../Loading/BigLoader';
+import {
+  formatAppointmentStatus,
+  formatConsultationType,
+  formatSpecializedConsultation,
+  formatSurgeryType,
+} from '@/lib/utils';
+import AddAppointmentModal from '../../Modals/AddAppointmentModal';
+import { AppointmentFormValues } from '@/lib/validator';
 
 interface AppointmentWithRelations extends Appointment {
   doctor: User;
@@ -23,6 +31,9 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
     []
   );
   const [loading, setLoading] = useState(true);
+  const [selectedAppointment, setSelectedAppointment] = useState<
+    (AppointmentFormValues & { id: string }) | undefined
+  >(undefined);
 
   useEffect(() => {
     async function fetchAppointments() {
@@ -39,35 +50,77 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
     fetchAppointments();
   }, [patientId]);
 
+  const handleClose = () => {
+    setIsOpen(false);
+    setSelectedAppointment(undefined);
+  };
+
+  const handleAppointmentClick = (appointment: AppointmentWithRelations) => {
+    const formValues: AppointmentFormValues & { id: string } = {
+      id: appointment.id,
+      patientId: appointment.patientId,
+      doctorId: appointment.doctorId,
+      date: new Date(appointment.date),
+      startTime: new Date(appointment.startTime),
+      endTime: new Date(appointment.endTime),
+      status: appointment.status,
+      consultationType: appointment.consultationType,
+      specializedConsultation: appointment.specializedConsultation || undefined,
+      surgeryType: appointment.surgeryType || undefined,
+      professor: appointment.professor || undefined,
+      description: appointment.description || undefined,
+    };
+    setSelectedAppointment(formValues);
+    setIsOpen(true);
+  };
+
   if (loading) {
     return <BigLoader />;
   }
 
   if (appointments.length === 0) {
     return (
-      <div className="space-y-4">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-medium">Rendez-vous</h1>
-          <Button
-            onClick={() => setIsOpen(true)}
-            className="flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Créer un rendez-vous
-          </Button>
-        </div>
+      <>
+        {isOpen && (
+          <AddAppointmentModal
+            isOpen={isOpen}
+            closeModal={handleClose}
+            mode="create"
+            appointmentData={selectedAppointment}
+          />
+        )}
+        <div className="space-y-4">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-xl font-medium">Rendez-vous</h1>
+            <Button
+              onClick={() => setIsOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Créer un rendez-vous
+            </Button>
+          </div>
 
-        <EmptyState
-          icon={Calendar}
-          title="Aucun rendez-vous"
-          description="Aucun rendez-vous n'a été planifié pour ce patient."
-        />
-      </div>
+          <EmptyState
+            icon={Calendar}
+            title="Aucun rendez-vous"
+            description="Aucun rendez-vous n'a été planifié pour ce patient."
+          />
+        </div>
+      </>
     );
   }
 
   return (
     <div className="w-full">
+      {isOpen && (
+        <AddAppointmentModal
+          isOpen={isOpen}
+          closeModal={handleClose}
+          mode={selectedAppointment ? 'edit' : 'create'}
+          appointmentData={selectedAppointment}
+        />
+      )}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-xl font-semibold">Rendez-vous</h1>
         <Button
@@ -112,14 +165,16 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
                 <td className="px-4 py-4 text-sm text-gray-900">
                   {format(new Date(appointment.startTime), 'p')}
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-900">
-                  {appointment.doctor?.name || 'N/A'}
+                <td className="px-4 py-4 text-sm text-gray-900 capitalize">
+                  Dr. {appointment.doctor?.name || 'N/A'}
                 </td>
                 <td className="px-4 py-4 text-sm text-gray-900">
-                  {appointment.consultationType}
                   {appointment.specializedConsultation &&
-                    ` - ${appointment.specializedConsultation}`}
-                  {appointment.surgeryType && ` - ${appointment.surgeryType}`}
+                    ` ${formatSpecializedConsultation(
+                      appointment.specializedConsultation
+                    )}`}
+                  {appointment.surgeryType &&
+                    ` ${formatSurgeryType(appointment.surgeryType)}`}
                 </td>
                 <td className="px-4 py-4 text-sm">
                   <span
@@ -133,14 +188,14 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
                         : 'bg-blue-100 text-blue-800'
                     }`}
                   >
-                    {appointment.status}
+                    {formatAppointmentStatus(appointment.status)}
                   </span>
                 </td>
                 <td className="px-4 py-4 text-sm">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setIsOpen(true)}
+                    onClick={() => handleAppointmentClick(appointment)}
                     className="flex items-center gap-2"
                   >
                     <Eye className="w-4 h-4" />

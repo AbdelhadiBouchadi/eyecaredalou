@@ -53,3 +53,43 @@ export const formatConsultationType = (type: string) => {
   };
   return mapping[type] || type;
 };
+
+export const formatSpecializedConsultation = (type: string) => {
+  const mapping: { [key: string]: string } = {
+    GLAUCOMA: 'Consultation Glaucome',
+    SURFACE: 'Consultation de Surface',
+    PEDIATRIC: 'Consultation Pédiatrique',
+    RETINA_UVEITIS: 'Consultation Rétine / Uvéite',
+  };
+  return mapping[type] || type;
+};
+
+export const formatSurgeryType = (type: string) => {
+  const mapping: { [key: string]: string } = {
+    CATARACT: 'Chirurgie de Cataracte',
+    RETINA: 'Chirurgie de Rétine',
+    ANNEXES: 'Chirurgie des Annexes',
+    STRABISMUS: 'Chirurgie de Strabisme',
+    CONGENITAL_CATARACT: 'Chirurgie de Cataracte Congénitale',
+  };
+  return mapping[type] || type;
+};
+
+export const formatProfessor = (professor: string) => {
+  const mapping: { [key: string]: string } = {
+    PR_MOUSTAINE: 'Pr Moustaine',
+    PR_BOUSLOUS: 'Pr Bouslous',
+    BOTH: 'Pr Moustaine / Pr Bouslous',
+  };
+  return mapping[professor] || professor;
+};
+
+export const formatAppointmentStatus = (status: string) => {
+  const mapping: { [key: string]: string } = {
+    COMPLETED: 'Terminé',
+    PENDING: 'En attente',
+    CANCELED: 'Annulé',
+    APPROVED: 'Approuvé',
+  };
+  return mapping[status] || status;
+};
