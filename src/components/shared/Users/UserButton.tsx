@@ -65,7 +65,7 @@ export function UserButton({ email, name, image }: UserButtonProps) {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <Link href="/profile" className="flex items-center gap-2">
+            <Link href="/settings" className="flex items-center gap-2">
               <Settings
                 size={16}
                 strokeWidth={2}
