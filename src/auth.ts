@@ -8,6 +8,22 @@ import { saltAndHashPassword } from './lib/utils';
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(db),
   session: { strategy: 'jwt' },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.role = user.role;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+      }
+      return session;
+    },
+  },
   providers: [
     Credentials({
       name: 'Credentials',
@@ -19,7 +35,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
         password: { label: 'Password', type: 'password' },
       },
-      authorize: async (credentials) => {
+      async authorize(credentials) {
         if (!credentials || !credentials.email || !credentials.password) {
           return null;
         }
@@ -50,7 +66,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
         }
 
-        return user;
+        return {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        };
       },
     }),
   ],

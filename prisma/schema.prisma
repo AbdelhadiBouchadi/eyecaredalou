@@ -15,7 +15,6 @@ datasource db {
 
 enum UserRole {
     DOCTOR
-    RECEPTIONIST
     VISITOR
     ADMIN
 }
@@ -23,7 +22,6 @@ enum UserRole {
 enum Gender {
     MALE
     FEMALE
-    OTHER
 }
 
 enum BloodGroup {
@@ -44,6 +42,32 @@ enum AppointmentStatus {
     COMPLETED
 }
 
+enum ConsultationType {
+    SPECIALIZED
+    SURGERY
+}
+
+enum SpecializedConsultation {
+    GLAUCOMA
+    SURFACE
+    PEDIATRIC
+    RETINA_UVEITIS
+}
+
+enum SurgeryType {
+    CATARACT
+    RETINA
+    ANNEXES
+    STRABISMUS
+    CONGENITAL_CATARACT
+}
+
+enum Professor {
+    PR_MOUSTAINE
+    PR_BOUSLOUS
+    BOTH
+}
+
 model User {
     id             String          @id @default(auto()) @map("_id") @db.ObjectId
     name           String?
@@ -58,6 +82,9 @@ model User {
     // Doctor-specific fields
     specialization String?
     appointments   Appointment[]   @relation("DoctorAppointments")
+    // Patients created by this user
+    createdPatients Patient[]     @relation("CreatedBy")
+    createdAppointment Appointment[] @relation("CreatedBy")
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -137,35 +164,16 @@ model Patient {
     eyeImages      EyeImage[]
 
     // Health Information
-    allergies      String[]
-    habits         PatientHabit[]
-    medicalHistory MedicalHistory[]
+    allergies      String?
+    habits         String?
+    medicalHistory String?
 
     // Stats
     totalAppointments Int @default(0)
-}
 
-model PatientHabit {
-    id        String    @id @default(auto()) @map("_id") @db.ObjectId
-    patientId String    @db.ObjectId
-    habit     String // e.g., "Smoking", "Alcohol"
-    frequency String // e.g., "Daily", "Occasional"
-    details   String?
-    startDate DateTime?
-    endDate   DateTime?
-
-    patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
-}
-
-model MedicalHistory {
-    id        String   @id @default(auto()) @map("_id") @db.ObjectId
-    patientId String   @db.ObjectId
-    condition String
-    diagnosis DateTime
-    treatment String?
-    notes     String?
-
-    patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+    // Created by
+    createdById String @db.ObjectId
+    createdBy   User   @relation("CreatedBy", fields: [createdById], references: [id])
 }
 
 model MedicalRecord {
@@ -193,19 +201,26 @@ model EyeImage {
 }
 
 model Appointment {
-    id          String            @id @default(auto()) @map("_id") @db.ObjectId
-    patientId   String            @db.ObjectId
-    doctorId    String            @db.ObjectId
-    date        DateTime
-    startTime   DateTime
-    endTime     DateTime
-    status      AppointmentStatus @default(PENDING)
-    service     String // Purpose of visit
-    description String?
+    id                     String                 @id @default(auto()) @map("_id") @db.ObjectId
+    patientId             String                 @db.ObjectId
+    doctorId              String                 @db.ObjectId
+    date                  DateTime
+    startTime             DateTime
+    endTime               DateTime
+    status               AppointmentStatus      @default(PENDING)
+    consultationType     ConsultationType
+    specializedConsultation SpecializedConsultation?
+    surgeryType          SurgeryType?
+    professor            Professor?
+    description          String?
 
     patient Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
     doctor  User    @relation("DoctorAppointments", fields: [doctorId], references: [id])
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+     // Created by
+    createdById String @db.ObjectId
+    createdBy   User   @relation("CreatedBy", fields: [createdById], references: [id])
 }

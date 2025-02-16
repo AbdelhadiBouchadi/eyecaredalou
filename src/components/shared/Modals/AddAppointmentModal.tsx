@@ -1,180 +1,448 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Modal from './Modal';
-import { DatePickerComp, Select, TimePickerComp } from '../Form';
-import { BiChevronDown, BiPlus } from 'react-icons/bi';
-import { HiOutlineCheckCircle } from 'react-icons/hi';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AppointmentStatus } from '@prisma/client';
 import { toast } from 'react-hot-toast';
-import PatientMedicineServiceModal from './PatientMedicineServiceModal';
-import { memberData, servicesData, sortsDatas } from '@/lib/data';
-import { Input } from '@/components/ui/input';
+import { HiOutlineCheckCircle } from 'react-icons/hi';
+import Modal from './Modal';
+import { DatePickerComp, TimePickerComp } from '../Form';
 import { Button } from '@/components/ui/button';
-import DropDown from '../Patients/DropDown';
-import SelectDoctor from './SelectDoctor';
-import SelectStatus from './SelectStatus';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-
-// Types
-type Service = {
-  id: string | number; // Accept either string or number for id
-  name: string;
-  price?: number;
-  date?: string;
-  status?: boolean;
-};
-
-type Status = {
-  id: string | number;
-  name: string;
-};
-
-type Doctor = {
-  id: string | number;
-  name: string;
-};
-
-interface AppointmentData {
-  title?: string;
-  service: Service;
-  start: Date;
-  end: Date;
-  message?: string;
-}
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import SelectStatus from './SelectStatus';
+import {
+  createAppointment,
+  updateAppointment,
+} from '@/lib/actions/appointment';
+import {
+  AppointmentFormValues,
+  createAppointmentSchema,
+} from '@/lib/validator';
+import { useRouter } from 'next/navigation';
+import { getPatients } from '@/lib/actions/patient';
+import { PatientWithRelations } from '@/types';
+import {
+  consultationTypes,
+  professors,
+  specializedConsultations,
+  surgeryTypes,
+} from '@/types/appointment';
+import SelectDoctor from '../Appointments/SelectDoctor';
 
 interface AddAppointmentModalProps {
   closeModal: () => void;
   isOpen: boolean;
-  datas?: AppointmentData;
+  appointmentData?: AppointmentFormValues & { id?: string };
+  mode?: 'create' | 'edit';
 }
 
-const doctorsData: Doctor[] = memberData.map((item) => ({
-  id: item.id,
-  name: item.title,
-}));
+const defaultValues: Partial<AppointmentFormValues> = {
+  patientId: '',
+  doctorId: '',
+  date: new Date(),
+  startTime: new Date(),
+  endTime: new Date(),
+  status: AppointmentStatus.PENDING,
+  consultationType: 'SPECIALIZED',
+  description: '',
+};
 
 const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   closeModal,
   isOpen,
-  datas,
+  appointmentData,
+  mode = 'create',
 }) => {
-  const [services, setServices] = useState<Service>({
-    id: String(servicesData[0].id), // Convert id to string
-    name: servicesData[0].name,
-  });
-  const [startDate, setStartDate] = useState<Date | null>(new Date());
-  const [startTime, setStartTime] = useState<Date | null>(new Date());
-  const [endTime, setEndTime] = useState<Date | null>(new Date());
-  const [status, setStatus] = useState<Status>({
-    id: String(sortsDatas.status[0].id), // Convert id to string
-    name: sortsDatas.status[0].name,
-  });
-  const [doctors, setDoctors] = useState<Doctor>(doctorsData[0]);
+  const router = useRouter();
+  const [patients, setPatients] = useState<PatientWithRelations[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [open, setOpen] = useState(false);
+  const form = useForm<AppointmentFormValues>({
+    resolver: zodResolver(createAppointmentSchema),
+    defaultValues: mode === 'create' ? defaultValues : undefined,
+  });
+
+  const consultationType = form.watch('consultationType');
 
   useEffect(() => {
-    if (datas) {
-      setServices(datas.service);
-      setStartTime(new Date(datas.start));
-      setEndTime(new Date(datas.end));
+    if (mode === 'edit' && appointmentData) {
+      // Reset form with appointment data
+      form.reset(appointmentData);
+
+      // Explicitly set each field
+      Object.entries(appointmentData).forEach(([key, value]) => {
+        if (value !== undefined && key !== 'id') {
+          form.setValue(key as keyof AppointmentFormValues, value, {
+            shouldValidate: true,
+            shouldDirty: true,
+            shouldTouch: true,
+          });
+        }
+      });
     }
-  }, [datas]);
+  }, [appointmentData, form, mode]);
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const data = await getPatients();
+        setPatients(data);
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+        toast.error('Failed to load patients');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatients();
+  }, []);
+
+  async function onSubmit(values: AppointmentFormValues) {
+    try {
+      const result =
+        mode === 'create'
+          ? await createAppointment(values)
+          : await updateAppointment(appointmentData?.id!, values);
+
+      if (result.success) {
+        toast.success(
+          mode === 'create'
+            ? 'Rendez-vous créé avec succès'
+            : 'Rendez-vous mis à jour avec succès'
+        );
+        router.refresh();
+        closeModal();
+      } else {
+        toast.error(
+          mode === 'create'
+            ? 'Erreur lors de la création du rendez-vous'
+            : 'Erreur lors de la mise à jour du rendez-vous'
+        );
+      }
+    } catch (error) {
+      toast.error('Une erreur est survenue');
+      console.error(error);
+    }
+  }
 
   return (
     <Modal
       closeModal={closeModal}
       isOpen={isOpen}
-      title={datas?.title ? 'Modifier Le Rendez-vous' : 'Créer un Rendez-vous'}
+      title={
+        mode === 'create' ? 'Créer un Rendez-vous' : 'Modifier Le Rendez-vous'
+      }
       width="max-w-3xl"
     >
-      {open && (
-        <PatientMedicineServiceModal
-          closeModal={() => setOpen(false)}
-          isOpen={open}
-          patient={true}
-        />
-      )}
-      <div className="flex-colo gap-6">
-        {/* Patient Name and Add Button */}
-        <div className="grid sm:grid-cols-12 gap-4 w-full items-center">
-          <div className="sm:col-span-12 flex justify-center items-center w-full gap-3">
-            <Input
-              placeholder="Nom du patient"
-              className="shad-input sm:col-span-10 "
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex-colo gap-6"
+        >
+          {/* Patient Selection */}
+          <FormField
+            control={form.control}
+            name="patientId"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Patient</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ''}
+                >
+                  <FormControl>
+                    <SelectTrigger className="capitalize">
+                      <SelectValue placeholder="Sélectionner un patient" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {patients?.map((patient: any) => (
+                      <SelectItem
+                        key={patient.id}
+                        value={patient.id}
+                        className="capitalize"
+                      >
+                        {patient.fullName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Doctor Selection */}
+          <FormField
+            control={form.control}
+            name="doctorId"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Docteur</FormLabel>
+                <FormControl>
+                  <SelectDoctor
+                    value={field.value}
+                    onChangeHandler={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Consultation Type */}
+          <FormField
+            control={form.control}
+            name="consultationType"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Type de Consultation</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  value={field.value || ''}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner le type de consultation" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {consultationTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Specialized Consultation Type */}
+          {consultationType === 'SPECIALIZED' && (
+            <FormField
+              control={form.control}
+              name="specializedConsultation"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Type de Consultation Spécialisée</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value || ''}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner le type de consultation spécialisée" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {specializedConsultations.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
+          )}
+
+          {/* Surgery Type */}
+          {consultationType === 'SURGERY' && (
+            <>
+              <FormField
+                control={form.control}
+                name="surgeryType"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Type de Chirurgie Programmée</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ''}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner le type de chirurgie" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {surgeryTypes.map((type) => (
+                          <SelectItem key={type.value} value={type.value}>
+                            {type.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="professor"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Professeur</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ''}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner le professeur" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {professors.map((prof) => (
+                          <SelectItem key={prof.value} value={prof.value}>
+                            {prof.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
+
+          {/* Date and Time Selection */}
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Date de visite</FormLabel>
+                <FormControl>
+                  <DatePickerComp
+                    label=""
+                    startDate={field.value}
+                    onChange={(date) => field.onChange(date)}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid sm:grid-cols-2 gap-4 w-full">
+            <FormField
+              control={form.control}
+              name="startTime"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Début du rendez-vous</FormLabel>
+                  <FormControl>
+                    <TimePickerComp
+                      label=""
+                      startDate={field.value}
+                      onChange={(date) => field.onChange(date)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="endTime"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Fin du rendez-vous</FormLabel>
+                  <FormControl>
+                    <TimePickerComp
+                      label=""
+                      startDate={field.value}
+                      onChange={(date) => field.onChange(date)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Status */}
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Status</FormLabel>
+                <FormControl>
+                  <SelectStatus
+                    value={field.value}
+                    onChangeHandler={field.onChange}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Description */}
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea
+                    rows={5}
+                    {...field}
+                    placeholder="Description du rendez-vous"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Buttons */}
+          <div className="grid sm:grid-cols-2 gap-4 w-full">
             <Button
-              onClick={() => setOpen(true)}
-              className="text-white bg-subMain hover:bg-background hover:text-subMain h-full flex-rows text-sm py-3.5 mt-3 sm:col-span-2 rounded-lg"
+              type="button"
+              onClick={closeModal}
+              className="bg-red-600 hover:bg-red-900 hover:bg-background hover:text-red-600 text-white text-sm p-4 rounded-lg font-normal"
             >
-              <BiPlus className="text-xl" /> Ajouter
+              {mode === 'edit' ? 'Annuler les modifications' : 'Annuler'}
+            </Button>
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting}
+              className="bg-subMain hover:bg-background hover:text-subMain text-white text-sm p-4 rounded-lg font-normal flex justify-center items-center gap-3"
+            >
+              {form.formState.isSubmitting
+                ? 'En cours de traitement...'
+                : 'Sauvegarder'}
+              <HiOutlineCheckCircle className="text-xl" />
             </Button>
           </div>
-        </div>
-
-        {/* Purpose and Date */}
-        <div className="grid sm:grid-cols-2 gap-4 w-full">
-          <div className="flex w-full flex-col gap-3">
-            <p className="text-black text-sm">Raison de la visite</p>
-            <DropDown onChangeHandler={() => ''} value="" />
-          </div>
-          <DatePickerComp
-            label="Date de visite"
-            startDate={startDate}
-            onChange={setStartDate}
-          />
-        </div>
-
-        {/* Time Selection */}
-        <div className="grid sm:grid-cols-2 gap-4 w-full">
-          <TimePickerComp
-            label="Début du rendez-vous"
-            startDate={startTime}
-            onChange={setStartTime}
-          />
-          <TimePickerComp
-            label="Fin du rendez-vous"
-            startDate={endTime}
-            onChange={setEndTime}
-          />
-        </div>
-
-        {/* Doctor and Status */}
-        <div className="grid sm:grid-cols-2 gap-4 w-full">
-          <div className="flex w-full flex-col gap-3">
-            <p className="text-black text-sm">Docteur</p>
-            <SelectDoctor onChangeHandler={() => ''} value="" />
-          </div>
-          <div className="flex w-full flex-col gap-3">
-            <p className="text-black text-sm">Status</p>
-            <SelectStatus onChangeHandler={() => ''} value="" />
-          </div>
-        </div>
-
-        {/* Description */}
-        <div className="w-full flex flex-col gap-3">
-          <Label className="text-start text-sm">Déscription</Label>
-          <Textarea rows={5} />
-        </div>
-
-        {/* Buttons */}
-        <div className="grid sm:grid-cols-2 gap-4 w-full">
-          <Button
-            onClick={closeModal}
-            className="bg-red-600 hover:bg-red-900 hover:bg-background hover:text-red-600 text-white text-sm p-4 rounded-lg font-normal"
-          >
-            {datas?.title ? 'Discard' : 'Annuler'}
-          </Button>
-          <Button
-            onClick={() => toast.error('This feature is not available yet')}
-            className="bg-subMain hover:bg-background hover:text-subMain text-white text-sm p-4 rounded-lg font-normal flex justify-center items-center gap-3"
-          >
-            Sauvegarder
-            <HiOutlineCheckCircle className="text-xl" />
-          </Button>
-        </div>
-      </div>
+        </form>
+      </Form>
     </Modal>
   );
 };

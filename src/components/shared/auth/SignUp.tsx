@@ -177,7 +177,10 @@ const SignupForm = () => {
           />
         </div>
 
-        <SubmitButton className="login-btn" isLoading={isLoading}>
+        <SubmitButton
+          className="flex justify-center items-center gap-2 w-full"
+          isLoading={isLoading}
+        >
           <p>Créer le compte</p>
           <BiUserPlus className="text-white text-2xl" />
         </SubmitButton>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Calendar,
   momentLocalizer,
@@ -10,79 +10,120 @@ import {
 import moment from 'moment';
 import 'moment/locale/fr'; // Import French locale
 import { BiPlus } from 'react-icons/bi';
-import { servicesData } from '@/lib/data';
 import AddAppointmentModal from '@/components/shared/Modals/AddAppointmentModal';
-import { AppointmentData } from '@/types/appointment';
-import { Service } from '@/types/medical';
 import CustomToolbar from '@/components/shared/Calendar/CustomToolBar';
+import { getAppointments } from '@/lib/actions/appointment';
+import { Appointment } from '@prisma/client';
+import { AppointmentFormValues } from '@/lib/validator';
+import BigLoader from '../Loading/BigLoader';
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  color: string;
+  resource: Appointment & {
+    patient?: { fullName: string };
+  };
+}
 
 const AppointmentsPage: React.FC = () => {
   moment.locale('fr');
   const localizer = momentLocalizer(moment);
 
   const [open, setOpen] = useState(false);
-  const [data, setData] = useState<AppointmentData | undefined>(undefined);
+  const [data, setData] = useState<
+    (AppointmentFormValues & { id: string }) | undefined
+  >(undefined);
   const [view, setView] = useState<View>('month');
   const [date, setDate] = useState(new Date());
+  const [appointments, setAppointments] = useState<
+    (Appointment & {
+      patient?: { fullName: string };
+    })[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const data = await getAppointments();
+        setAppointments(data);
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
 
   const handleClose = () => {
     setOpen(false);
     setData(undefined);
   };
 
-  const createService = (serviceData: Partial<Service>): Service => ({
-    id: serviceData.id!,
-    name: serviceData.name!,
-    price: serviceData.price || 0,
-    date: serviceData.date || new Date().toISOString(),
-    status: serviceData.status || false,
-  });
-
-  const events: AppointmentData[] = [
-    {
-      id: 0,
-      start: moment({ hours: 7 }).toDate(),
-      end: moment({ hours: 9 }).toDate(),
-      color: '#FB923C',
-      title: 'John Doe',
-      message: 'He is not sure about the time',
-      service: createService(servicesData[1]),
-      shareData: { email: true, sms: true, whatsapp: false },
-    },
-    {
-      id: 1,
-      start: moment({ hours: 12 }).toDate(),
-      end: moment({ hours: 13 }).toDate(),
-      color: '#FB923C',
-      title: 'Minah Mmassy',
-      message: 'She is coming for checkup',
-      service: createService(servicesData[2]),
-      shareData: { email: false, sms: true, whatsapp: false },
-    },
-    {
-      id: 2,
-      start: moment({ hours: 14 }).toDate(),
-      end: moment({ hours: 17 }).toDate(),
-      color: '#FB923C',
-      title: 'Irene P. Smith',
-      message: 'She is coming for checkup. but she is not sure about the time',
-      service: createService(servicesData[3]),
-      shareData: { email: true, sms: true, whatsapp: true },
-    },
-  ];
-
-  const handleEventClick = (event: AppointmentData) => {
-    setData(event);
+  const handleEventClick = (event: CalendarEvent) => {
+    const appointment = event.resource;
+    // Convert Appointment to AppointmentFormValues
+    const formValues: AppointmentFormValues & { id: string } = {
+      id: appointment.id,
+      patientId: appointment.patientId,
+      doctorId: appointment.doctorId,
+      date: new Date(appointment.date),
+      startTime: new Date(appointment.startTime),
+      endTime: new Date(appointment.endTime),
+      status: appointment.status,
+      consultationType: appointment.consultationType,
+      specializedConsultation: appointment.specializedConsultation || undefined,
+      surgeryType: appointment.surgeryType || undefined,
+      professor: appointment.professor || undefined,
+      description: appointment.description || undefined,
+    };
+    setData(formValues);
     setOpen(true);
   };
+
+  const events: CalendarEvent[] = appointments.map((appointment) => ({
+    id: appointment.id,
+    title: `${appointment.patient?.fullName || 'Patient'} 
+    `,
+    start: new Date(appointment.startTime),
+    end: new Date(appointment.endTime),
+    color: 'black',
+    resource: appointment,
+  }));
+
+  // // Get color based on appointment status
+  // const getStatusColor = (status: string) => {
+  //   switch (status) {
+  //     case 'PENDING':
+  //       return '#FFA500'; // Orange
+  //     case 'APPROVED':
+  //       return '#4CAF50'; // Green
+  //     case 'CANCELED':
+  //       return '#F44336'; // Red
+  //     case 'COMPLETED':
+  //       return '#2196F3'; // Blue
+  //     default:
+  //       return '#07b8db'; // Default color
+  //   }
+  // };
+
+  if (loading) {
+    return <BigLoader />;
+  }
 
   return (
     <>
       {open && (
         <AddAppointmentModal
-          datas={data}
           isOpen={open}
           closeModal={handleClose}
+          mode={data ? 'edit' : 'create'}
+          appointmentData={data}
         />
       )}
       <button
@@ -91,13 +132,13 @@ const AppointmentsPage: React.FC = () => {
       >
         <BiPlus className="text-2xl" />
       </button>
-      <Calendar<AppointmentData>
+      <Calendar<CalendarEvent>
         localizer={localizer}
         events={events}
         startAccessor="start"
         endAccessor="end"
         style={{ height: 900, marginBottom: 50 }}
-        onSelectEvent={handleEventClick}
+        onSelectEvent={(event: CalendarEvent) => handleEventClick(event)}
         date={date}
         onNavigate={setDate}
         view={view}
@@ -108,7 +149,7 @@ const AppointmentsPage: React.FC = () => {
         views={['month', 'day', 'work_week']}
         eventPropGetter={(event) => ({
           style: {
-            backgroundColor: event.color || '#07b8db',
+            backgroundColor: 'black',
             borderRadius: '10px',
             color: 'white',
             border: '1px solid #F2FAF8',
@@ -123,7 +164,7 @@ const AppointmentsPage: React.FC = () => {
         })}
         components={{
           toolbar: CustomToolbar as React.ComponentType<
-            ToolbarProps<AppointmentData, object>
+            ToolbarProps<CalendarEvent, object>
           >,
         }}
         messages={{

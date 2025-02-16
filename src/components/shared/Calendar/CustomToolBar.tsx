@@ -70,7 +70,7 @@ const CustomToolbar: React.FC<ToolbarProps> = (toolbar) => {
             <button
               key={index}
               onClick={() => goToView(item.view)}
-              className={`border-l text-xl py-2 flex-colo border-subMain ${
+              className={`rounded-md text-xl py-2 flex-colo border-subMain ${
                 toolbar.view === item.view
                   ? 'bg-subMain text-white'
                   : 'text-subMain'

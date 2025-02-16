@@ -21,10 +21,11 @@ import {
 } from 'react-icons/ri';
 import { MdOutlineReviews } from 'react-icons/md';
 import { BiCalendar, BiUserPlus } from 'react-icons/bi';
+import { Calendar, FileText, Heart, Image, User } from 'lucide-react';
 
 export const MenuDatas = [
   {
-    title: 'Dashboard',
+    title: 'Accueil',
     path: '/',
     icon: HiOutlineHome,
   },
@@ -34,8 +35,8 @@ export const MenuDatas = [
     icon: TbUsers,
   },
   {
-    title: 'Réceptions',
-    path: '/receptionists',
+    title: 'Utilisateurs',
+    path: '/users',
     icon: HiOutlineUsers,
   },
   {
@@ -50,7 +51,7 @@ export const MenuDatas = [
     icon: FaRegCalendarAlt,
   },
   {
-    title: 'Settings',
+    title: 'Paramètres',
     path: '/settings',
     icon: AiOutlineSetting,
   },
@@ -1200,5 +1201,33 @@ export const convData = [
       image: false,
       me: false,
     },
+  },
+];
+
+export const patientTabs = [
+  {
+    id: 1,
+    title: 'Dossiers Médicaux',
+    icon: FileText,
+  },
+  {
+    id: 2,
+    title: 'Rendez-vous',
+    icon: Calendar,
+  },
+  {
+    id: 3,
+    title: 'Images',
+    icon: Image,
+  },
+  {
+    id: 4,
+    title: 'Informations Personnelles',
+    icon: User,
+  },
+  {
+    id: 5,
+    title: 'Informations de Santé',
+    icon: Heart,
   },
 ];

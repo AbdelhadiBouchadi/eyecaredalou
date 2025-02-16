@@ -122,7 +122,10 @@ const SignInForm = () => {
         </div>
 
         {/* Submit Button */}
-        <SubmitButton className="login-btn" isLoading={isLoading}>
+        <SubmitButton
+          className="flex justify-center items-center gap-2 w-full"
+          isLoading={isLoading}
+        >
           <p>Se Connecter</p>
           <BiLogInCircle className="text-white text-2xl" />
         </SubmitButton>

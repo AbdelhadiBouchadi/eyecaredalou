@@ -15,7 +15,7 @@ interface SidebarLinkProps {
 const SidebarLink = ({ title, path, icon }: SidebarLinkProps) => {
   const pathname = usePathname();
   const isActive =
-    pathname === path || (pathname === '/' && path === '/dashboard');
+    pathname === path || (path !== '/' && pathname.startsWith(path));
 
   return (
     <Link

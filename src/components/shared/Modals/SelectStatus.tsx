@@ -1,5 +1,4 @@
-'use client';
-
+import { AppointmentStatus } from '@prisma/client';
 import {
   Select,
   SelectContent,
@@ -7,45 +6,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { memberData } from '@/lib/data';
-import { useEffect, useState } from 'react';
 
-type SelectStatusProps = {
-  value?: string;
-  onChangeHandler: (value: string) => void;
-};
+interface SelectStatusProps {
+  value: AppointmentStatus;
+  onChangeHandler: (value: AppointmentStatus) => void;
+}
 
-const status = [
-  { id: 'canceled', title: 'Annulé' },
-  { id: 'approved', title: 'Approuvé' },
-  { id: 'pending', title: 'En attente' },
+const statusOptions = [
+  { value: AppointmentStatus.PENDING, label: 'En attente' },
+  { value: AppointmentStatus.APPROVED, label: 'Approuvé' },
+  { value: AppointmentStatus.CANCELED, label: 'Annulé' },
+  { value: AppointmentStatus.COMPLETED, label: 'Terminé' },
 ];
 
 const SelectStatus = ({ value, onChangeHandler }: SelectStatusProps) => {
-  const [selectedValue, setSelectedValue] = useState(value?.toString() || '');
-
-  useEffect(() => {
-    setSelectedValue(value?.toString() || '');
-  }, [value]);
-
-  const handleChange = (value: string) => {
-    setSelectedValue(value);
-    onChangeHandler(value);
-  };
-
   return (
-    <Select onValueChange={handleChange}>
-      <SelectTrigger className="shad-select-trigger">
-        <SelectValue placeholder={'Choisir un service'} />
+    <Select
+      value={value}
+      onValueChange={(val) => onChangeHandler(val as AppointmentStatus)}
+    >
+      <SelectTrigger>
+        <SelectValue placeholder="Sélectionner un status" />
       </SelectTrigger>
-      <SelectContent className="shad-select-content capitalize">
-        {status.map((item, index) => (
-          <SelectItem
-            key={index}
-            value={item.id}
-            className="flex cursor-pointer items-center gap-2 hover:text-subMain"
-          >
-            {item.title}
+      <SelectContent>
+        {statusOptions.map((status) => (
+          <SelectItem key={status.value} value={status.value}>
+            {status.label}
           </SelectItem>
         ))}
       </SelectContent>

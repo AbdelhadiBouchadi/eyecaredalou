@@ -2,9 +2,10 @@
 
 import { signIn, signOut } from '@/auth';
 import { db } from '@/db';
-import { AuthError } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { comparePasswords, saltAndHashPassword } from '../utils';
+import { UpdateUserProfileValues } from '../validator';
+import { UserRole } from '@prisma/client';
 
 export const getUserByEmail = async (email: string) => {
   try {
@@ -62,7 +63,7 @@ export const loginWithCreds = async (formData: FormData): Promise<void> => {
   try {
     await signIn('credentials', rawFormData);
   } catch (error: any) {
-    if (error instanceof AuthError) {
+    if (error) {
       switch (error.type) {
         case 'CredentialsSignin':
           console.error('Invalid credentials!');
@@ -103,3 +104,74 @@ export const registerUser = async (formData: FormData): Promise<void> => {
     },
   });
 };
+
+export const updateUserProfile = async (
+  userId: string,
+  values: UpdateUserProfileValues
+) => {
+  try {
+    const user = await db.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      return { success: false, error: 'User not found' };
+    }
+
+    // If changing password, verify current password
+    if (values.currentPassword && values.newPassword) {
+      if (!user.hashedPassword) {
+        return { success: false, error: 'No password set for this account' };
+      }
+
+      const isPasswordValid = await comparePasswords(
+        values.currentPassword,
+        user.hashedPassword
+      );
+
+      if (!isPasswordValid) {
+        return { success: false, error: 'Current password is incorrect' };
+      }
+
+      values.newPassword = saltAndHashPassword(values.newPassword);
+    }
+
+    // Remove password fields from update data
+    const { currentPassword, newPassword, ...updateData } = values;
+
+    await db.user.update({
+      where: { id: userId },
+      data: updateData,
+    });
+
+    revalidatePath('/profile');
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    return { success: false, error: 'Failed to update profile' };
+  }
+};
+
+export async function getDoctors() {
+  try {
+    const doctors = await db.user.findMany({
+      where: {
+        role: UserRole.DOCTOR,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        specialization: true,
+      },
+    });
+
+    return doctors;
+  } catch (error) {
+    console.error('Error fetching doctors:', error);
+    throw error;
+  }
+}

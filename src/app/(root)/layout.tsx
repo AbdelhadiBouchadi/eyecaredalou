@@ -32,7 +32,13 @@ export default async function RootLayout({
         <Sidebar />
       </div>
       <div className="col-span-10 xl:h-screen overflow-y-scroll relative">
-        <Header />
+        <Header
+          user={{
+            name: data?.name,
+            email: data?.email,
+            image: data?.image,
+          }}
+        />
         <div className="xs:px-8 px-2 pt-24">{children}</div>
       </div>
     </div>
