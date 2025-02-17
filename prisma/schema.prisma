@@ -205,8 +205,6 @@ model Appointment {
     patientId             String                 @db.ObjectId
     doctorId              String                 @db.ObjectId
     date                  DateTime
-    startTime             DateTime
-    endTime               DateTime
     status               AppointmentStatus      @default(PENDING)
     consultationType     ConsultationType
     specializedConsultation SpecializedConsultation?

@@ -22,8 +22,6 @@ export async function createAppointment(data: AppointmentFormValues) {
         patientId: data.patientId,
         doctorId: data.doctorId,
         date: data.date,
-        startTime: data.startTime,
-        endTime: data.endTime,
         status: data.status as AppointmentStatus,
         consultationType: data.consultationType,
         specializedConsultation: data.specializedConsultation,
@@ -73,8 +71,6 @@ export async function updateAppointment(
         patientId: data.patientId,
         doctorId: data.doctorId,
         date: data.date,
-        startTime: data.startTime,
-        endTime: data.endTime,
         status: data.status as AppointmentStatus,
         consultationType: data.consultationType,
         specializedConsultation: data.specializedConsultation,
@@ -157,12 +153,33 @@ export async function getAppointmentsByPatientId(patientId: string) {
 
 export async function deleteAppointment(id: string) {
   try {
-    const appointment = await db.appointment.delete({
+    // First get the appointment to know the patient ID
+    const appointment = await db.appointment.findUnique({
+      where: { id },
+      select: { patientId: true },
+    });
+
+    if (!appointment) {
+      throw new Error('Appointment not found');
+    }
+
+    // Delete the appointment
+    await db.appointment.delete({
       where: { id },
     });
 
+    // Update patient's total appointments count
+    await db.patient.update({
+      where: { id: appointment.patientId },
+      data: {
+        totalAppointments: {
+          decrement: 1,
+        },
+      },
+    });
+
     revalidatePath('/appointments');
-    return { success: true, appointment };
+    return { success: true };
   } catch (error) {
     console.error('Error deleting appointment:', error);
     return { success: false, error: (error as Error).message };

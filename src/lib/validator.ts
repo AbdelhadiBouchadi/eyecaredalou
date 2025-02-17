@@ -129,12 +129,6 @@ export const createAppointmentSchema = z
     date: z.date({
       required_error: 'La date est requise',
     }),
-    startTime: z.date({
-      required_error: "L'heure de début est requise",
-    }),
-    endTime: z.date({
-      required_error: "L'heure de fin est requise",
-    }),
     status: z.nativeEnum(AppointmentStatus, {
       required_error: 'Le status est requis',
     }),
@@ -159,15 +153,6 @@ export const createAppointmentSchema = z
     description: z.string().optional(),
     createdById: z.string().optional(), // Add this field
   })
-  .refine(
-    (data) => {
-      return data.startTime < data.endTime;
-    },
-    {
-      message: "L'heure de fin doit être après l'heure de début",
-      path: ['endTime'],
-    }
-  )
   .refine(
     (data) => {
       if (data.consultationType === 'SPECIALIZED') {

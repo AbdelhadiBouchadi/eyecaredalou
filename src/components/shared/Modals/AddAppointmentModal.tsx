@@ -7,7 +7,7 @@ import { AppointmentStatus } from '@prisma/client';
 import { toast } from 'react-hot-toast';
 import { HiOutlineCheckCircle } from 'react-icons/hi';
 import Modal from './Modal';
-import { DatePickerComp, TimePickerComp } from '../Form';
+import { DatePickerComp } from '../Form';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
@@ -45,6 +45,22 @@ import {
 } from '@/types/appointment';
 import SelectDoctor from '../Appointments/SelectDoctor';
 import { DeleteAppointment } from '../Appointments/DeleteAppointment';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { CircleLoader } from 'react-spinners';
 
 interface AddAppointmentModalProps {
   closeModal: () => void;
@@ -57,8 +73,6 @@ const defaultValues: Partial<AppointmentFormValues> = {
   patientId: '',
   doctorId: '',
   date: new Date(),
-  startTime: new Date(),
-  endTime: new Date(),
   status: AppointmentStatus.PENDING,
   consultationType: 'SPECIALIZED',
   description: '',
@@ -73,6 +87,8 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   const router = useRouter();
   const [patients, setPatients] = useState<PatientWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
 
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(createAppointmentSchema),
@@ -83,10 +99,8 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
 
   useEffect(() => {
     if (mode === 'edit' && appointmentData) {
-      // Reset form with appointment data
       form.reset(appointmentData);
 
-      // Explicitly set each field
       Object.entries(appointmentData).forEach(([key, value]) => {
         if (value !== undefined && key !== 'id') {
           form.setValue(key as keyof AppointmentFormValues, value, {
@@ -102,11 +116,18 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   useEffect(() => {
     const fetchPatients = async () => {
       try {
+        setLoading(true);
         const data = await getPatients();
-        setPatients(data);
+        if (Array.isArray(data)) {
+          setPatients(data);
+        } else {
+          console.error('Received invalid patients data:', data);
+          setPatients([]);
+        }
       } catch (error) {
         console.error('Error fetching patients:', error);
         toast.error('Failed to load patients');
+        setPatients([]);
       } finally {
         setLoading(false);
       }
@@ -114,6 +135,10 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
 
     fetchPatients();
   }, []);
+
+  const filteredPatients = patients.filter((patient) =>
+    patient.fullName.toLowerCase().includes(searchValue.toLowerCase())
+  );
 
   async function onSubmit(values: AppointmentFormValues) {
     try {
@@ -143,6 +168,21 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
     }
   }
 
+  if (loading) {
+    return (
+      <Modal
+        closeModal={closeModal}
+        isOpen={isOpen}
+        title="Chargement..."
+        width="max-w-3xl"
+      >
+        <div className="flex items-center justify-center p-8">
+          <CircleLoader color="#07b8db" />
+        </div>
+      </Modal>
+    );
+  }
+
   return (
     <Modal
       closeModal={closeModal}
@@ -164,27 +204,63 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel>Patient</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value || ''}
-                >
-                  <FormControl>
-                    <SelectTrigger className="capitalize">
-                      <SelectValue placeholder="Sélectionner un patient" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {patients?.map((patient: any) => (
-                      <SelectItem
-                        key={patient.id}
-                        value={patient.id}
-                        className="capitalize"
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={open}
+                        className={cn(
+                          'w-full justify-between capitalize',
+                          !field.value && 'text-muted-foreground'
+                        )}
                       >
-                        {patient.fullName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                        {field.value
+                          ? patients.find(
+                              (patient) => patient.id === field.value
+                            )?.fullName || 'Sélectionner un patient'
+                          : 'Rechercher un patient...'}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px] p-0">
+                    <Command>
+                      <CommandInput
+                        placeholder="Rechercher un patient..."
+                        value={searchValue}
+                        onValueChange={setSearchValue}
+                      />
+                      <CommandList>
+                        <CommandEmpty>Aucun patient trouvé.</CommandEmpty>
+                        <CommandGroup>
+                          {filteredPatients.map((patient) => (
+                            <CommandItem
+                              key={patient.id}
+                              value={patient.fullName}
+                              onSelect={() => {
+                                form.setValue('patientId', patient.id);
+                                setOpen(false);
+                                setSearchValue('');
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  patient.id === field.value
+                                    ? 'opacity-100'
+                                    : 'opacity-0'
+                                )}
+                              />
+                              {patient.fullName}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}
@@ -329,7 +405,7 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
             </>
           )}
 
-          {/* Date and Time Selection */}
+          {/* Date Selection */}
           <FormField
             control={form.control}
             name="date"
@@ -347,43 +423,6 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
               </FormItem>
             )}
           />
-
-          <div className="grid sm:grid-cols-2 gap-4 w-full">
-            <FormField
-              control={form.control}
-              name="startTime"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Début du rendez-vous</FormLabel>
-                  <FormControl>
-                    <TimePickerComp
-                      label=""
-                      startDate={field.value}
-                      onChange={(date) => field.onChange(date)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="endTime"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Fin du rendez-vous</FormLabel>
-                  <FormControl>
-                    <TimePickerComp
-                      label=""
-                      startDate={field.value}
-                      onChange={(date) => field.onChange(date)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
 
           {/* Status */}
           <FormField

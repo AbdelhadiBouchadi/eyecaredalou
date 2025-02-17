@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Calendar,
   momentLocalizer,
@@ -12,10 +12,8 @@ import 'moment/locale/fr';
 import { BiPlus } from 'react-icons/bi';
 import AddAppointmentModal from '@/components/shared/Modals/AddAppointmentModal';
 import CustomToolbar from '@/components/shared/Calendar/CustomToolBar';
-import { getAppointments } from '@/lib/actions/appointment';
 import { Appointment } from '@prisma/client';
 import { AppointmentFormValues } from '@/lib/validator';
-import BigLoader from '../Loading/BigLoader';
 import CustomDayHeader from '../Calendar/CustomDayHeader';
 
 interface CalendarEvent {
@@ -60,8 +58,6 @@ const AppointmentsPage: React.FC<AppointmentsPageProps> = ({
       patientId: appointment.patientId,
       doctorId: appointment.doctorId,
       date: new Date(appointment.date),
-      startTime: new Date(appointment.startTime),
-      endTime: new Date(appointment.endTime),
       status: appointment.status,
       consultationType: appointment.consultationType,
       specializedConsultation: appointment.specializedConsultation || undefined,
@@ -92,25 +88,17 @@ const AppointmentsPage: React.FC<AppointmentsPageProps> = ({
     // Create a Date object from the appointment date
     const appointmentDate = new Date(appointment.date);
 
-    // Get hours and minutes from startTime and endTime
-    const startTime = new Date(appointment.startTime);
-    const endTime = new Date(appointment.endTime);
-
     // Create new Date objects for start and end by combining the appointment date with time
     const start = new Date(
       appointmentDate.getFullYear(),
       appointmentDate.getMonth(),
-      appointmentDate.getDate(),
-      startTime.getHours(),
-      startTime.getMinutes()
+      appointmentDate.getDate()
     );
 
     const end = new Date(
       appointmentDate.getFullYear(),
       appointmentDate.getMonth(),
-      appointmentDate.getDate(),
-      endTime.getHours(),
-      endTime.getMinutes()
+      appointmentDate.getDate()
     );
 
     return {
@@ -187,7 +175,7 @@ const AppointmentsPage: React.FC<AppointmentsPageProps> = ({
           date: 'Date',
           time: 'Heure',
           event: 'Événement',
-          showMore: (total) => `+ ${total} rendez-vous`,
+          showMore: (total) => `+ ${total} RDV`,
         }}
       />
     </>
