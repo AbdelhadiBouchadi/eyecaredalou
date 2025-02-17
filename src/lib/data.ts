@@ -316,15 +316,6 @@ export const dashboardCards = [
     color: ['bg-yellow-500', 'text-yellow-500', '#F9C851'],
     datas: [20, 50, 75, 15, 108, 97, 70, 41, 50, 20, 90, 60],
   },
-  {
-    id: 3,
-    title: 'Préscriptions',
-    icon: TbFile,
-    value: 4160,
-    percent: 65.06,
-    color: ['bg-[#66B5A3]', 'text-[#66B5A3]', '#66B5A3'],
-    datas: [92, 80, 45, 15, 49, 77, 70, 51, 110, 20, 90, 60],
-  },
 ];
 
 export const reviewData = [

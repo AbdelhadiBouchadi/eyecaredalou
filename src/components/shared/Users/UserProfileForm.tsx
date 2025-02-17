@@ -36,9 +36,10 @@ import { formatUserRole } from '@/lib/utils';
 
 interface UserProfileFormProps {
   user: User;
+  sessionUser?: User;
 }
 
-export function UserProfileForm({ user }: UserProfileFormProps) {
+export function UserProfileForm({ user, sessionUser }: UserProfileFormProps) {
   const router = useRouter();
   const [files, setFiles] = useState<File[]>([]);
   const [previewImageUrl, setPreviewImageUrl] = useState<string | undefined>(
@@ -85,15 +86,15 @@ export function UserProfileForm({ user }: UserProfileFormProps) {
       });
 
       if (result.success) {
-        toast.success('Profile updated successfully');
+        toast.success('Profil a été mis à jour avec succès');
         router.refresh();
         setFiles([]);
         setShowPasswordFields(false);
       } else {
-        toast.error(result.error || 'An error occurred');
+        toast.error(result.error || 'Une erreure est survenue');
       }
     } catch (error) {
-      toast.error('Failed to update profile');
+      toast.error('Une erreure est survenue');
       console.error(error);
     }
   }
@@ -159,7 +160,7 @@ export function UserProfileForm({ user }: UserProfileFormProps) {
                 <Select
                   onValueChange={field.onChange}
                   value={field.value}
-                  disabled={user.role !== UserRole.ADMIN}
+                  disabled={sessionUser?.role !== UserRole.ADMIN}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Choisir un role" />

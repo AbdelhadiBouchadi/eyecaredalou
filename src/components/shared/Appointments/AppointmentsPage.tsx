@@ -16,6 +16,7 @@ import { getAppointments } from '@/lib/actions/appointment';
 import { Appointment } from '@prisma/client';
 import { AppointmentFormValues } from '@/lib/validator';
 import BigLoader from '../Loading/BigLoader';
+import CustomDayHeader from '../Calendar/CustomDayHeader';
 
 interface CalendarEvent {
   id: string;
@@ -28,7 +29,15 @@ interface CalendarEvent {
   };
 }
 
-const AppointmentsPage: React.FC = () => {
+interface AppointmentsPageProps {
+  appointments: (Appointment & {
+    patient?: { fullName: string };
+  })[];
+}
+
+const AppointmentsPage: React.FC<AppointmentsPageProps> = ({
+  appointments,
+}) => {
   moment.locale('fr');
   const localizer = momentLocalizer(moment);
 
@@ -38,27 +47,6 @@ const AppointmentsPage: React.FC = () => {
   >(undefined);
   const [view, setView] = useState<View>('month');
   const [date, setDate] = useState(new Date());
-  const [appointments, setAppointments] = useState<
-    (Appointment & {
-      patient?: { fullName: string };
-    })[]
-  >([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const data = await getAppointments();
-        setAppointments(data);
-      } catch (error) {
-        console.error('Error fetching appointments:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAppointments();
-  }, []);
 
   const handleClose = () => {
     setOpen(false);
@@ -135,10 +123,6 @@ const AppointmentsPage: React.FC = () => {
     };
   });
 
-  if (loading) {
-    return <BigLoader />;
-  }
-
   return (
     <>
       {open && (
@@ -189,6 +173,7 @@ const AppointmentsPage: React.FC = () => {
           toolbar: CustomToolbar as React.ComponentType<
             ToolbarProps<CalendarEvent, object>
           >,
+          header: CustomDayHeader,
         }}
         messages={{
           allDay: 'Toute la journée',

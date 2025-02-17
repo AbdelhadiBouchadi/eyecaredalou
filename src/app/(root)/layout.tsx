@@ -12,6 +12,7 @@ import Sidebar from '@/components/shared/Sidebar';
 import Header from '@/components/shared/Header';
 import { requireUser } from '@/hooks';
 import { getUserByEmail } from '@/lib/actions/auth';
+import { VisitorApprovalMessage } from '@/components/shared/Users/VisitorApprovalMessage';
 
 export const metadata: Metadata = {
   title: 'Système de Gestion Ophtalmologie',
@@ -25,6 +26,9 @@ export default async function RootLayout({
 }>) {
   const session = await requireUser();
   const data = await getUserByEmail(session?.user?.email as string);
+  const isVisitor = data?.role === 'VISITOR';
+
+  if (isVisitor) return <VisitorApprovalMessage />;
 
   return (
     <div className="grid xl:grid-cols-12 w-full">

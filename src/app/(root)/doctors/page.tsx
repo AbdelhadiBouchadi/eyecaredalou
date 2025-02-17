@@ -1,7 +1,19 @@
-import React from 'react';
+import { Suspense } from 'react';
+import Loading from './loading';
+import { getDoctors, getDoctorsStats } from '@/lib/actions/auth';
+import DoctorsPage from '@/components/shared/Users/DoctorsPage';
 
-const page = () => {
-  return <div>page</div>;
-};
+export const revalidate = 0;
 
-export default page;
+export default async function Page() {
+  const [doctors, totalDoctors] = await Promise.all([
+    getDoctors(),
+    getDoctorsStats(),
+  ]);
+
+  return (
+    <Suspense fallback={<Loading />}>
+      <DoctorsPage doctors={doctors} totalDoctors={totalDoctors} />
+    </Suspense>
+  );
+}

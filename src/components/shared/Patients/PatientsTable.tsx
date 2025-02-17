@@ -1,23 +1,12 @@
 'use client';
 
-import { FiEye, FiTrash2 } from 'react-icons/fi';
+import { FiEye } from 'react-icons/fi';
 import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
 import { cn, formatBloodGroup } from '@/lib/utils';
 import { PatientWithRelations } from '@/types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { deletePatient } from '@/lib/actions/patient';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';

@@ -1,8 +1,16 @@
+import { Suspense } from 'react';
+import { getAppointments } from '@/lib/actions/appointment';
 import AppointmentsPage from '@/components/shared/Appointments/AppointmentsPage';
-import React from 'react';
+import Loading from './loading';
 
-const page = () => {
-  return <AppointmentsPage />;
-};
+export const revalidate = 0;
 
-export default page;
+export default async function Page() {
+  const appointments = await getAppointments();
+
+  return (
+    <Suspense fallback={<Loading />}>
+      <AppointmentsPage appointments={appointments} />
+    </Suspense>
+  );
+}

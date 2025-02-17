@@ -281,6 +281,35 @@ button:focus {
   display: block !important;
 }
 
+.rbc-time-view .rbc-row {
+  min-height: auto !important;
+}
+
+.rbc-header:nth-child(1) {
+  @apply !bg-blue-400;
+}
+.rbc-header:nth-child(2) {
+  @apply !bg-green-400;
+}
+.rbc-header:nth-child(3) {
+  @apply !bg-yellow-400;
+}
+.rbc-header:nth-child(4) {
+  @apply !bg-purple-400;
+}
+.rbc-header:nth-child(5) {
+  @apply !bg-pink-400;
+}
+.rbc-header:nth-child(6) {
+  @apply !bg-slate-400;
+}
+.rbc-header:nth-child(7) {
+  @apply !bg-slate-400;
+}
+
+.rbc-row-segment .rbc-event .rbc-event-content {
+  @apply capitalize;
+}
 /* siku */
 .rbc-time-header-content .rbc-header,
 .rbc-month-header .rbc-header {

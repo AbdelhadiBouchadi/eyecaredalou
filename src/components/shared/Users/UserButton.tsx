@@ -26,7 +26,7 @@ export function UserButton({ email, name, image }: UserButtonProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
-          <div className="flex gap-4 items-center rounded-full border border-dashed border-subMain shadow-xl hover:scale-110 transition-all duration-300">
+          <div className="flex gap-4 items-center rounded-full border border-dashed border-subMain ">
             <Avatar>
               {image ? (
                 <AvatarImage

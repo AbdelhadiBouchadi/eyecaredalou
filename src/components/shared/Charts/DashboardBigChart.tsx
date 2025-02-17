@@ -1,9 +1,18 @@
 'use client';
 
 import React from 'react';
-import Chart from 'react-apexcharts';
+import dynamic from 'next/dynamic';
+const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
-const DashboardBigChart = () => {
+interface DashboardBigChartProps {
+  patientStats: number[];
+  appointmentStats: number[];
+}
+
+const DashboardBigChart = ({
+  patientStats,
+  appointmentStats,
+}: DashboardBigChartProps) => {
   const options: ApexCharts.ApexOptions = {
     chart: {
       id: 'area-datetime',
@@ -51,7 +60,6 @@ const DashboardBigChart = () => {
         show: false,
       },
     },
-
     yaxis: {
       show: true,
       labels: {
@@ -61,25 +69,21 @@ const DashboardBigChart = () => {
           fontSize: '10px',
           fontWeight: 400,
         },
-        formatter: function (value) {
-          return value + 'k';
-        },
       },
     },
     dataLabels: {
       enabled: false,
     },
     tooltip: {
-      custom: function ({ series, seriesIndex, dataPointIndex }) {
-        return (
-          '<div className="bg-white py-2 px-2 text-xs border-[.5px] border-border">' +
-          'Total:' +
-          ' ' +
-          '<span className="font-semibold">' +
-          series[seriesIndex][dataPointIndex] +
-          '</span>' +
-          '</div>'
-        );
+      shared: true,
+      custom: undefined,
+      x: {
+        format: 'dd MMM yyyy',
+      },
+      y: {
+        formatter: function (value) {
+          return value.toString();
+        },
       },
     },
     grid: {
@@ -90,27 +94,36 @@ const DashboardBigChart = () => {
     },
     stroke: {
       curve: 'smooth',
-      width: 1,
+      width: 2,
     },
-
     fill: {
       type: 'gradient',
       gradient: {
         shade: 'light',
         type: 'vertical',
         shadeIntensity: 0.5,
-        inverseColors: true,
+        inverseColors: false,
         opacityFrom: 0.5,
         opacityTo: 0,
         stops: [0, 100],
       },
     },
-    colors: ['#07b8db'],
+    colors: ['#07b8db', '#F9C851'],
+    legend: {
+      show: true,
+      position: 'top',
+      horizontalAlign: 'right',
+    },
   };
+
   const series = [
     {
-      name: 'Total',
-      data: [30, 40, 25, 50, 49, 21, 70, 51, 42, 60, 40, 20],
+      name: 'Patients',
+      data: patientStats,
+    },
+    {
+      name: 'Rendez-vous',
+      data: appointmentStats,
     },
   ];
 

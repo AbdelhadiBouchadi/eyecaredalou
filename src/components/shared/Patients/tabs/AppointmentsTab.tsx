@@ -16,6 +16,7 @@ import {
 } from '@/lib/utils';
 import AddAppointmentModal from '../../Modals/AddAppointmentModal';
 import { AppointmentFormValues } from '@/lib/validator';
+import { fr } from 'date-fns/locale';
 
 interface AppointmentWithRelations extends Appointment {
   doctor: User;
@@ -160,10 +161,10 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
             {appointments.map((appointment) => (
               <tr key={appointment.id}>
                 <td className="px-4 py-4 text-sm text-gray-900">
-                  {format(new Date(appointment.date), 'PP')}
+                  {format(new Date(appointment.date), 'PP', { locale: fr })}
                 </td>
                 <td className="px-4 py-4 text-sm text-gray-900">
-                  {format(new Date(appointment.startTime), 'p')}
+                  {format(new Date(appointment.startTime), 'p', { locale: fr })}
                 </td>
                 <td className="px-4 py-4 text-sm text-gray-900 capitalize">
                   Dr. {appointment.doctor?.name || 'N/A'}

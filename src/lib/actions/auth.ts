@@ -152,6 +152,79 @@ export const updateUserProfile = async (
   }
 };
 
+export async function getUsers() {
+  try {
+    const users = await db.user.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        image: true,
+        createdAt: true,
+      },
+    });
+
+    return users;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error;
+  }
+}
+
+export async function getUserStats() {
+  try {
+    const [doctors, visitors, admins] = await Promise.all([
+      db.user.count({
+        where: { role: UserRole.DOCTOR },
+      }),
+      db.user.count({
+        where: { role: UserRole.VISITOR },
+      }),
+      db.user.count({
+        where: { role: UserRole.ADMIN },
+      }),
+    ]);
+
+    return {
+      doctors,
+      visitors,
+      admins,
+    };
+  } catch (error) {
+    console.error('Error fetching user stats:', error);
+    throw error;
+  }
+}
+
+export async function getUserById(id: string) {
+  try {
+    const user = await db.user.findUnique({
+      where: { id },
+    });
+    return user;
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  }
+}
+
+export async function deleteUser(id: string) {
+  try {
+    await db.user.delete({
+      where: { id },
+    });
+    revalidatePath('/users');
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return { success: false, error: 'Failed to delete user' };
+  }
+}
+
 export async function getDoctors() {
   try {
     const doctors = await db.user.findMany({
@@ -170,6 +243,21 @@ export async function getDoctors() {
     });
 
     return doctors;
+  } catch (error) {
+    console.error('Error fetching doctors:', error);
+    throw error;
+  }
+}
+
+export async function getDoctorsStats() {
+  try {
+    const doctorCounts = db.user.count({
+      where: {
+        role: UserRole.DOCTOR,
+      },
+    });
+
+    return doctorCounts;
   } catch (error) {
     console.error('Error fetching doctors:', error);
     throw error;
