@@ -1,8 +1,6 @@
 'use client';
 
-import Link from 'next/link';
 import React, { useEffect } from 'react';
-import { BiPlus } from 'react-icons/bi';
 import { FaUserMd } from 'react-icons/fa';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -27,12 +25,6 @@ const DoctorsPage = ({ doctors, totalDoctors }: DoctorsPageProps) => {
 
   return (
     <>
-      <Link
-        href="/doctors/create"
-        className="w-16 h-16 border border-border z-50 bg-subMain text-white rounded-full flex-colo fixed bottom-8 right-12 button-fb"
-      >
-        <BiPlus className="text-2xl" />
-      </Link>
       <h1 className="text-xl font-semibold">Médecins</h1>
 
       <div className="grid grid-cols-1 gap-8 mt-8">
