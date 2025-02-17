@@ -14,9 +14,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { buttonVariants } from '@/components/ui/button';
-import { deletePatient } from '@/lib/actions/patient';
 import { useRouter } from 'next/navigation';
 import { FiTrash2 } from 'react-icons/fi';
+import { deleteUser } from '@/lib/actions/auth';
 
 interface DeleteUserProps {
   userId: string;
@@ -54,8 +54,8 @@ export const DeleteUser = ({ userId, className }: DeleteUserProps) => {
           <AlertDialogAction
             onClick={() =>
               startTransition(async () => {
-                await deletePatient(userId);
-                router.push('/patients');
+                await deleteUser(userId);
+                router.refresh();
               })
             }
             className="bg-red-600 text-white hover:bg-red-700"
