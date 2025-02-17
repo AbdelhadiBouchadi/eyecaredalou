@@ -60,7 +60,7 @@ export function PatientProfile({ patient }: PatientProfileProps) {
           <div className="flex flex-col sm:flex-row items-center gap-3">
             <p className="font-semibold text-gray-900 mr-3">Créé par:</p>{' '}
             <p className="capitalize">
-              {patient.createdBy.name || patient.createdBy.email}
+              Dr. {patient.createdBy.name || patient.createdBy.email}
             </p>
           </div>
         )}

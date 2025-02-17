@@ -118,14 +118,17 @@ export const updateUserProfile = async (
       return { success: false, error: 'User not found' };
     }
 
+    // Remove password fields from update data
+    const { currentPassword, newPassword, ...updateData } = values;
+
     // If changing password, verify current password
-    if (values.currentPassword && values.newPassword) {
+    if (currentPassword && newPassword) {
       if (!user.hashedPassword) {
         return { success: false, error: 'No password set for this account' };
       }
 
       const isPasswordValid = await comparePasswords(
-        values.currentPassword,
+        currentPassword,
         user.hashedPassword
       );
 
@@ -133,16 +136,21 @@ export const updateUserProfile = async (
         return { success: false, error: 'Current password is incorrect' };
       }
 
-      values.newPassword = saltAndHashPassword(values.newPassword);
+      // Update the user with the new hashed password
+      await db.user.update({
+        where: { id: userId },
+        data: {
+          ...updateData,
+          hashedPassword: saltAndHashPassword(newPassword),
+        },
+      });
+    } else {
+      // Update user without changing password
+      await db.user.update({
+        where: { id: userId },
+        data: updateData,
+      });
     }
-
-    // Remove password fields from update data
-    const { currentPassword, newPassword, ...updateData } = values;
-
-    await db.user.update({
-      where: { id: userId },
-      data: updateData,
-    });
 
     revalidatePath('/profile');
     return { success: true };

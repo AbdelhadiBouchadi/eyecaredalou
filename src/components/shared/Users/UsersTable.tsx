@@ -74,7 +74,7 @@ export const UserTable: React.FC<UserTableProps> = ({ data }) => {
                   className="w-12 h-12 rounded-full object-cover border border-border mx-auto"
                 />
               ) : (
-                <span className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mx-auto">
+                <span className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center mx-auto">
                   {user.name?.[0].toUpperCase() ||
                     user.email?.[0].toUpperCase()}
                 </span>

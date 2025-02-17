@@ -44,6 +44,7 @@ import {
   surgeryTypes,
 } from '@/types/appointment';
 import SelectDoctor from '../Appointments/SelectDoctor';
+import { DeleteAppointment } from '../Appointments/DeleteAppointment';
 
 interface AddAppointmentModalProps {
   closeModal: () => void;
@@ -423,13 +424,20 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
 
           {/* Buttons */}
           <div className="grid sm:grid-cols-2 gap-4 w-full">
-            <Button
-              type="button"
-              onClick={closeModal}
-              className="bg-red-600 hover:bg-red-900 hover:bg-background hover:text-red-600 text-white text-sm p-4 rounded-lg font-normal"
-            >
-              {mode === 'edit' ? 'Annuler les modifications' : 'Annuler'}
-            </Button>
+            {mode === 'edit' ? (
+              <DeleteAppointment
+                appointmentId={appointmentData?.id}
+                onDelete={closeModal}
+              />
+            ) : (
+              <Button
+                type="button"
+                onClick={closeModal}
+                className="bg-red-600 hover:bg-red-900 hover:bg-background hover:text-red-600 text-white text-sm p-4 rounded-lg font-normal"
+              >
+                Annuler
+              </Button>
+            )}
             <Button
               type="submit"
               disabled={form.formState.isSubmitting}

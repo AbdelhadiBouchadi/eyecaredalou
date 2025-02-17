@@ -177,9 +177,9 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
                   {appointment.surgeryType &&
                     ` ${formatSurgeryType(appointment.surgeryType)}`}
                 </td>
-                <td className="px-4 py-4 text-sm">
+                <td className="">
                   <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${
+                    className={` px-2 py-1 text-xs font-medium rounded-full ${
                       appointment.status === 'COMPLETED'
                         ? 'bg-green-100 text-green-800'
                         : appointment.status === 'PENDING'

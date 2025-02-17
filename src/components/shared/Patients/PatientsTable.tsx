@@ -83,6 +83,7 @@ export const PatientTable: React.FC<PatientTableProps> = ({ data }) => {
             </td>
             <td className={tdClass}>
               <p className="capitalize">
+                Dr.{' '}
                 {patient.createdBy?.name || patient.createdBy?.email || 'N/A'}
               </p>
             </td>

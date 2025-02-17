@@ -40,7 +40,7 @@ export const DoctorTable: React.FC<DoctorTableProps> = ({ data }) => {
             <td className={tdClass}>{index + 1}</td>
 
             <td className={tdClass}>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-center gap-4">
                 <FaUserMd className="size-10 p-2 rounded-full bg-primary/10 text-subMain" />
                 <h4 className="text-sm font-medium capitalize">
                   {doctor.name || 'N/A'}
