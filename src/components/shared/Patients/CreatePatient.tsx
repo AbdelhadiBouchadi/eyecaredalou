@@ -213,7 +213,7 @@ export default function CreatePatient() {
                   <FormLabel>Habitudes</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Toutes les habitudes ( tabagiste, alcoolique ...)"
+                      placeholder="Toutes les habitudes ( tabagique, alcoolique ...)"
                       className="resize-none"
                       {...field}
                     />
