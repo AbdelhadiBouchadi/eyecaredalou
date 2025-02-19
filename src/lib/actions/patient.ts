@@ -27,13 +27,6 @@ export async function createPatient(data: PatientFormValues) {
       throw new Error('User ID not found in session');
     }
 
-    // Log session data for debugging
-    console.log('Session:', {
-      sessionExists: !!session,
-      userExists: !!session.user,
-      userId: session.user.id,
-    });
-
     const patient = await db.patient.create({
       data: {
         fullName: data.fullName,
@@ -44,6 +37,7 @@ export async function createPatient(data: PatientFormValues) {
         habits: data.habits || '',
         medicalHistory: data.medicalHistory || '',
         profileImage: data.profileImage,
+        observationImage: data.observationImage,
         createdById: userId,
       },
       include: {

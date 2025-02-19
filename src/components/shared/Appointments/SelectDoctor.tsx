@@ -50,7 +50,7 @@ const SelectDoctor = ({ value, onChangeHandler }: SelectDoctorProps) => {
   }
 
   return (
-    <Select value={value} onValueChange={onChangeHandler}>
+    <Select onValueChange={onChangeHandler} value={value || ''}>
       <SelectTrigger className="capitalize">
         <SelectValue placeholder="Sélectionner un docteur" />
       </SelectTrigger>

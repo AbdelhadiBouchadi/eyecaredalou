@@ -36,11 +36,20 @@ const defaultValues: Partial<PatientFormValues> = {
   habits: '',
   medicalHistory: '',
   profileImage: '',
+  observationImage: '',
 };
 
 export default function CreatePatient() {
   const router = useRouter();
-  const [files, setFiles] = useState<File[]>([]);
+  const [profileFiles, setProfileFiles] = useState<File[]>([]);
+  const [observationFiles, setObservationFiles] = useState<File[]>([]);
+  const [previewProfileUrl, setPreviewProfileUrl] = useState<
+    string | undefined
+  >();
+  const [previewObservationUrl, setPreviewObservationUrl] = useState<
+    string | undefined
+  >();
+
   const form = useForm<PatientFormValues>({
     resolver: zodResolver(createPatientFormSchema),
     defaultValues,
@@ -50,24 +59,27 @@ export default function CreatePatient() {
 
   async function onSubmit(values: PatientFormValues) {
     try {
-      let uploadedImageUrl = values.profileImage;
+      let profileImageUrl = values.profileImage;
+      let observationImageUrl = values.observationImage;
 
-      // If a new image is uploaded, handle the upload
-      if (files.length > 0) {
-        const uploadedImages = await startUpload(files);
+      if (profileFiles.length > 0) {
+        const uploadedImages = await startUpload(profileFiles);
         if (uploadedImages && uploadedImages[0]?.url) {
-          uploadedImageUrl = uploadedImages[0].url;
+          profileImageUrl = uploadedImages[0].url;
         }
       }
 
-      const formData = new FormData();
-      Object.entries(values).forEach(([key, value]) => {
-        formData.append(key, value.toString());
-      });
+      if (observationFiles.length > 0) {
+        const uploadedImages = await startUpload(observationFiles);
+        if (uploadedImages && uploadedImages[0]?.url) {
+          observationImageUrl = uploadedImages[0].url;
+        }
+      }
 
       const result = await createPatient({
         ...values,
-        profileImage: uploadedImageUrl,
+        profileImage: profileImageUrl,
+        observationImage: observationImageUrl,
       });
 
       if (result.success) {
@@ -82,6 +94,26 @@ export default function CreatePatient() {
       console.error(error);
     }
   }
+
+  const handleProfileFileChange = (urls: string[]) => {
+    if (urls.length > 0) {
+      setPreviewProfileUrl(urls[0]);
+      form.setValue('profileImage', urls[0]);
+    } else {
+      setPreviewProfileUrl(undefined);
+      form.setValue('profileImage', undefined);
+    }
+  };
+
+  const handleObservationFileChange = (urls: string[]) => {
+    if (urls.length > 0) {
+      setPreviewObservationUrl(urls[0]);
+      form.setValue('observationImage', urls[0]);
+    } else {
+      setPreviewObservationUrl(undefined);
+      form.setValue('observationImage', undefined);
+    }
+  };
 
   return (
     <>
@@ -107,12 +139,31 @@ export default function CreatePatient() {
               render={({ field }) => (
                 <FormItem className="flex gap-3 flex-col w-full">
                   <FormLabel>Image de profile</FormLabel>
-
                   <FormControl>
                     <FileUploader
-                      onFieldChange={(urls) => field.onChange(urls[0])}
-                      imageUrls={field.value ? [field.value] : []}
-                      setFiles={setFiles}
+                      onFieldChange={handleProfileFileChange}
+                      imageUrls={previewProfileUrl ? [previewProfileUrl] : []}
+                      setFiles={setProfileFiles}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="observationImage"
+              render={({ field }) => (
+                <FormItem className="flex gap-3 flex-col w-full">
+                  <FormLabel>Image d'observation</FormLabel>
+                  <FormControl>
+                    <FileUploader
+                      onFieldChange={handleObservationFileChange}
+                      imageUrls={
+                        previewObservationUrl ? [previewObservationUrl] : []
+                      }
+                      setFiles={setObservationFiles}
                     />
                   </FormControl>
                   <FormMessage />

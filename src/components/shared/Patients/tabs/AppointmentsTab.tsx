@@ -5,21 +5,12 @@ import { Plus, Eye, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
 import { EmptyState } from '@/components/shared/EmptyState';
-import { Appointment, User } from '@prisma/client';
 import { getAppointmentsByPatientId } from '@/lib/actions/appointment';
 import BigLoader from '../../Loading/BigLoader';
-import {
-  formatAppointmentStatus,
-  formatSpecializedConsultation,
-  formatSurgeryType,
-} from '@/lib/utils';
+import { formatSpecializedConsultation, formatSurgeryType } from '@/lib/utils';
 import AddAppointmentModal from '../../Modals/AddAppointmentModal';
-import { AppointmentFormValues } from '@/lib/validator';
 import { fr } from 'date-fns/locale';
-
-interface AppointmentWithRelations extends Appointment {
-  doctor: User;
-}
+import { AppointmentWithRelations } from '@/types';
 
 interface AppointmentsTabProps {
   patientId: string;
@@ -32,14 +23,14 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
   );
   const [loading, setLoading] = useState(true);
   const [selectedAppointment, setSelectedAppointment] = useState<
-    (AppointmentFormValues & { id: string }) | undefined
+    AppointmentWithRelations | undefined
   >(undefined);
 
   useEffect(() => {
     async function fetchAppointments() {
       try {
         const patientAppointments = await getAppointmentsByPatientId(patientId);
-        setAppointments(patientAppointments as AppointmentWithRelations[]);
+        setAppointments(patientAppointments);
       } catch (error) {
         console.error('Error fetching appointments:', error);
       } finally {
@@ -56,20 +47,7 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
   };
 
   const handleAppointmentClick = (appointment: AppointmentWithRelations) => {
-    const formValues: AppointmentFormValues & { id: string } = {
-      id: appointment.id,
-      patientId: appointment.patientId,
-      doctorId: appointment.doctorId,
-      date: new Date(appointment.date),
-
-      status: appointment.status,
-      consultationType: appointment.consultationType,
-      specializedConsultation: appointment.specializedConsultation || undefined,
-      surgeryType: appointment.surgeryType || undefined,
-      professor: appointment.professor || undefined,
-      description: appointment.description || undefined,
-    };
-    setSelectedAppointment(formValues);
+    setSelectedAppointment(appointment);
     setIsOpen(true);
   };
 
@@ -85,7 +63,7 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
             isOpen={isOpen}
             closeModal={handleClose}
             mode="create"
-            appointmentData={selectedAppointment}
+            appointmentData={undefined}
           />
         )}
         <div className="space-y-4">
@@ -138,15 +116,11 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
               <th className="px-2 py-3 text-left text-xs font-medium text-gray-500">
                 Date
               </th>
-
               <th className="px-2 py-3 text-left text-xs font-medium text-gray-500">
                 Docteur
               </th>
               <th className="px-2 py-3 text-left text-xs font-medium text-gray-500">
                 Type
-              </th>
-              <th className="px-2 py-3 text-left text-xs font-medium text-gray-500">
-                Status
               </th>
               <th className="px-2 py-3 text-left text-xs font-medium text-gray-500">
                 Actions
@@ -159,7 +133,6 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
                 <td className="px-2 py-4 text-sm text-gray-900">
                   {format(new Date(appointment.date), 'PP', { locale: fr })}
                 </td>
-
                 <td className="px-2 py-4 text-sm text-gray-900 capitalize">
                   Dr. {appointment.doctor?.name || 'N/A'}
                 </td>
@@ -170,21 +143,6 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
                     )}`}
                   {appointment.surgeryType &&
                     ` ${formatSurgeryType(appointment.surgeryType)}`}
-                </td>
-                <td className="min-w-16">
-                  <span
-                    className={`w-full px-2 py-1 text-xs font-medium rounded-full ${
-                      appointment.status === 'COMPLETED'
-                        ? 'bg-green-100 text-green-800'
-                        : appointment.status === 'PENDING'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : appointment.status === 'CANCELED'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-blue-100 text-blue-800'
-                    }`}
-                  >
-                    {formatAppointmentStatus(appointment.status)}
-                  </span>
                 </td>
                 <td className="px-2 py-4 text-sm">
                   <Button

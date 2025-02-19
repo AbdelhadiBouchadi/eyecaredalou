@@ -56,6 +56,7 @@ export const createPatientFormSchema = z.object({
   habits: z.string().optional(),
   medicalHistory: z.string().optional(),
   profileImage: z.string().optional(),
+  observationImage: z.string().optional(),
 });
 
 export type PatientFormValues = z.infer<typeof createPatientFormSchema>;
@@ -73,6 +74,7 @@ export const updatePatientFormSchema = z.object({
   habits: z.string().optional(),
   medicalHistory: z.string().optional(),
   profileImage: z.string().optional(),
+  observationImage: z.string().optional(),
 });
 
 export type UpdatePatientFormValues = z.infer<typeof updatePatientFormSchema>;
@@ -84,6 +86,7 @@ export const updatePersonalInfoSchema = z.object({
     required_error: 'Veuillez choisir un genre',
   }),
   profileImage: z.string().optional(),
+  observationImage: z.string().optional(),
 });
 
 export type UpdatePersonalInfoValues = z.infer<typeof updatePersonalInfoSchema>;
@@ -128,9 +131,6 @@ export const createAppointmentSchema = z
     doctorId: z.string().min(1, 'Le docteur est requis'),
     date: z.date({
       required_error: 'La date est requise',
-    }),
-    status: z.nativeEnum(AppointmentStatus, {
-      required_error: 'Le status est requis',
     }),
     consultationType: z.enum(['SPECIALIZED', 'SURGERY'] as const, {
       required_error: 'Le type de consultation est requis',

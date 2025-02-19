@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AppointmentStatus } from '@prisma/client';
 import { toast } from 'react-hot-toast';
 import { HiOutlineCheckCircle } from 'react-icons/hi';
 import Modal from './Modal';
@@ -25,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import SelectStatus from './SelectStatus';
 import {
   createAppointment,
   updateAppointment,
@@ -36,7 +34,11 @@ import {
 } from '@/lib/validator';
 import { useRouter } from 'next/navigation';
 import { getPatients } from '@/lib/actions/patient';
-import { PatientWithRelations } from '@/types';
+import {
+  AppointmentFormData,
+  AppointmentWithRelations,
+  PatientWithRelations,
+} from '@/types';
 import {
   consultationTypes,
   professors,
@@ -58,22 +60,23 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Check, ChevronsUpDown, UserPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CircleLoader } from 'react-spinners';
+import AddPatientModal from './AddPatientModal';
+import SubmitButton from '../auth/SubmitButton';
 
 interface AddAppointmentModalProps {
   closeModal: () => void;
   isOpen: boolean;
-  appointmentData?: AppointmentFormValues & { id?: string };
+  appointmentData?: AppointmentWithRelations;
   mode?: 'create' | 'edit';
 }
 
-const defaultValues: Partial<AppointmentFormValues> = {
+const defaultValues: AppointmentFormData = {
   patientId: '',
   doctorId: '',
   date: new Date(),
-  status: AppointmentStatus.PENDING,
   consultationType: 'SPECIALIZED',
   description: '',
 };
@@ -89,8 +92,9 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
+  const [showAddPatient, setShowAddPatient] = useState(false);
 
-  const form = useForm<AppointmentFormValues>({
+  const form = useForm<AppointmentFormData>({
     resolver: zodResolver(createAppointmentSchema),
     defaultValues: mode === 'create' ? defaultValues : undefined,
   });
@@ -99,40 +103,43 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
 
   useEffect(() => {
     if (mode === 'edit' && appointmentData) {
-      form.reset(appointmentData);
+      console.log('Appointment Data:', appointmentData); // Add this line
+      const formData: AppointmentFormData = {
+        patientId: appointmentData.patientId || '',
+        doctorId: appointmentData.doctorId || '',
+        date: appointmentData.date || new Date(),
+        consultationType: appointmentData.consultationType || 'SPECIALIZED',
+        specializedConsultation:
+          appointmentData.specializedConsultation || undefined,
+        surgeryType: appointmentData.surgeryType || undefined,
+        professor: appointmentData.professor || undefined,
+        description: appointmentData.description || '',
+      };
 
-      Object.entries(appointmentData).forEach(([key, value]) => {
-        if (value !== undefined && key !== 'id') {
-          form.setValue(key as keyof AppointmentFormValues, value, {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-          });
-        }
-      });
+      form.reset(formData);
     }
   }, [appointmentData, form, mode]);
 
-  useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        setLoading(true);
-        const data = await getPatients();
-        if (Array.isArray(data)) {
-          setPatients(data);
-        } else {
-          console.error('Received invalid patients data:', data);
-          setPatients([]);
-        }
-      } catch (error) {
-        console.error('Error fetching patients:', error);
-        toast.error('Failed to load patients');
+  const fetchPatients = async () => {
+    try {
+      setLoading(true);
+      const data = await getPatients();
+      if (Array.isArray(data)) {
+        setPatients(data);
+      } else {
+        console.error('Received invalid patients data:', data);
         setPatients([]);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching patients:', error);
+      toast.error('Failed to load patients');
+      setPatients([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchPatients();
   }, []);
 
@@ -140,7 +147,13 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
     patient.fullName.toLowerCase().includes(searchValue.toLowerCase())
   );
 
-  async function onSubmit(values: AppointmentFormValues) {
+  const handlePatientCreated = async (patientId: string) => {
+    await fetchPatients();
+    form.setValue('patientId', patientId);
+    setSearchValue('');
+  };
+
+  async function onSubmit(values: AppointmentFormData) {
     try {
       const result =
         mode === 'create'
@@ -184,154 +197,148 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   }
 
   return (
-    <Modal
-      closeModal={closeModal}
-      isOpen={isOpen}
-      title={
-        mode === 'create' ? 'Créer un Rendez-vous' : 'Modifier Le Rendez-vous'
-      }
-      width="max-w-3xl"
-    >
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex-colo gap-6"
-        >
-          {/* Patient Selection */}
-          <FormField
-            control={form.control}
-            name="patientId"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Patient</FormLabel>
-                <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={open}
-                        className={cn(
-                          'w-full justify-between capitalize',
-                          !field.value && 'text-muted-foreground'
-                        )}
-                      >
-                        {field.value
-                          ? patients.find(
-                              (patient) => patient.id === field.value
-                            )?.fullName || 'Sélectionner un patient'
-                          : 'Rechercher un patient...'}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[400px] p-0">
-                    <Command>
-                      <CommandInput
-                        placeholder="Rechercher un patient..."
-                        value={searchValue}
-                        onValueChange={setSearchValue}
-                      />
-                      <CommandList>
-                        <CommandEmpty>Aucun patient trouvé.</CommandEmpty>
-                        <CommandGroup>
-                          {filteredPatients.map((patient) => (
-                            <CommandItem
-                              key={patient.id}
-                              value={patient.fullName}
-                              onSelect={() => {
-                                form.setValue('patientId', patient.id);
-                                setOpen(false);
-                                setSearchValue('');
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  patient.id === field.value
-                                    ? 'opacity-100'
-                                    : 'opacity-0'
-                                )}
-                              />
-                              {patient.fullName}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Doctor Selection */}
-          <FormField
-            control={form.control}
-            name="doctorId"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Docteur</FormLabel>
-                <FormControl>
-                  <SelectDoctor
-                    value={field.value}
-                    onChangeHandler={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Consultation Type */}
-          <FormField
-            control={form.control}
-            name="consultationType"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Type de Consultation</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  value={field.value || ''}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner le type de consultation" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {consultationTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.value}>
-                        {type.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Specialized Consultation Type */}
-          {consultationType === 'SPECIALIZED' && (
+    <>
+      <Modal
+        closeModal={closeModal}
+        isOpen={isOpen}
+        title={
+          mode === 'create'
+            ? 'Créer un Rendez-vous'
+            : `Modifier Le Rendez-vous${
+                appointmentData?.createdBy?.name ||
+                appointmentData?.createdBy?.email
+                  ? ` | Crée par: Dr. ${
+                      appointmentData.createdBy.name ||
+                      appointmentData.createdBy.email
+                    }`
+                  : ''
+              }`
+        }
+        width="max-w-3xl"
+      >
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex-colo gap-6"
+          >
+            {/* Patient Selection */}
             <FormField
               control={form.control}
-              name="specializedConsultation"
+              name="patientId"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Type de Consultation Spécialisée</FormLabel>
+                  <FormLabel>Patient</FormLabel>
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={open}
+                          className={cn(
+                            'w-full justify-between capitalize',
+                            !field.value && 'text-muted-foreground'
+                          )}
+                        >
+                          {field.value
+                            ? patients.find(
+                                (patient) => patient.id === field.value
+                              )?.fullName || 'Sélectionner un patient'
+                            : 'Rechercher un patient...'}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[400px] p-0">
+                      <Command>
+                        <CommandInput
+                          placeholder="Rechercher un patient..."
+                          value={searchValue}
+                          onValueChange={setSearchValue}
+                        />
+                        <CommandList>
+                          <CommandEmpty className="py-6 text-center text-sm">
+                            <p>Aucun patient trouvé.</p>
+                            <Button
+                              variant="ghost"
+                              className="mt-4 mx-auto flex items-center gap-2 text-primary"
+                              onClick={() => {
+                                setOpen(false);
+                                setShowAddPatient(true);
+                              }}
+                            >
+                              <UserPlus className="w-4 h-4" />
+                              Créer un nouveau patient ?
+                            </Button>
+                          </CommandEmpty>
+                          <CommandGroup>
+                            {filteredPatients.map((patient) => (
+                              <CommandItem
+                                key={patient.id}
+                                value={patient.fullName}
+                                onSelect={() => {
+                                  form.setValue('patientId', patient.id);
+                                  setOpen(false);
+                                  setSearchValue('');
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    patient.id === field.value
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                                {patient.fullName}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Doctor Selection */}
+            <FormField
+              control={form.control}
+              name="doctorId"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Docteur</FormLabel>
+                  <FormControl>
+                    <SelectDoctor
+                      value={field.value}
+                      onChangeHandler={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Consultation Type */}
+            <FormField
+              control={form.control}
+              name="consultationType"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Type de Consultation</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value || ''}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner le type de consultation spécialisée" />
+                        <SelectValue placeholder="Sélectionner le type de consultation" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {specializedConsultations.map((type) => (
+                      {consultationTypes.map((type) => (
                         <SelectItem key={type.value} value={type.value}>
                           {type.label}
                         </SelectItem>
@@ -342,28 +349,26 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
                 </FormItem>
               )}
             />
-          )}
 
-          {/* Surgery Type */}
-          {consultationType === 'SURGERY' && (
-            <>
+            {/* Specialized Consultation Type */}
+            {consultationType === 'SPECIALIZED' && (
               <FormField
                 control={form.control}
-                name="surgeryType"
+                name="specializedConsultation"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Type de Chirurgie Programmée</FormLabel>
+                    <FormLabel>Type de Consultation Spécialisée</FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       value={field.value || ''}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner le type de chirurgie" />
+                          <SelectValue placeholder="Sélectionner le type de consultation spécialisée" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {surgeryTypes.map((type) => (
+                        {specializedConsultations.map((type) => (
                           <SelectItem key={type.value} value={type.value}>
                             {type.label}
                           </SelectItem>
@@ -374,123 +379,142 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="professor"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Professeur</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value || ''}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner le professeur" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {professors.map((prof) => (
-                          <SelectItem key={prof.value} value={prof.value}>
-                            {prof.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </>
-          )}
-
-          {/* Date Selection */}
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Date de visite</FormLabel>
-                <FormControl>
-                  <DatePickerComp
-                    label=""
-                    startDate={field.value}
-                    onChange={(date) => field.onChange(date)}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
             )}
-          />
 
-          {/* Status */}
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Status</FormLabel>
-                <FormControl>
-                  <SelectStatus
-                    value={field.value}
-                    onChangeHandler={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* Surgery Type */}
+            {consultationType === 'SURGERY' && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="surgeryType"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Type de Chirurgie Programmée</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value || ''}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner le type de chirurgie" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {surgeryTypes.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-          {/* Description */}
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    rows={5}
-                    {...field}
-                    placeholder="Description du rendez-vous"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                <FormField
+                  control={form.control}
+                  name="professor"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Professeur</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value || ''}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionner le professeur" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {professors.map((prof) => (
+                            <SelectItem key={prof.value} value={prof.value}>
+                              {prof.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
             )}
-          />
 
-          {/* Buttons */}
-          <div className="grid sm:grid-cols-2 gap-4 w-full">
-            {mode === 'edit' ? (
-              <DeleteAppointment
-                appointmentId={appointmentData?.id}
-                onDelete={closeModal}
-              />
-            ) : (
-              <Button
-                type="button"
-                onClick={closeModal}
-                className="bg-red-600 hover:bg-red-900 hover:bg-background hover:text-red-600 text-white text-sm p-4 rounded-lg font-normal"
-              >
-                Annuler
-              </Button>
-            )}
-            <Button
-              type="submit"
-              disabled={form.formState.isSubmitting}
-              className="bg-subMain hover:bg-background hover:text-subMain text-white text-sm p-4 rounded-lg font-normal flex justify-center items-center gap-3"
-            >
-              {form.formState.isSubmitting
-                ? 'En cours de traitement...'
-                : 'Sauvegarder'}
-              <HiOutlineCheckCircle className="text-xl" />
-            </Button>
-          </div>
-        </form>
-      </Form>
-    </Modal>
+            {/* Date Selection */}
+            <FormField
+              control={form.control}
+              name="date"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Date de visite</FormLabel>
+                  <FormControl>
+                    <DatePickerComp
+                      label=""
+                      startDate={field.value}
+                      onChange={(date) => field.onChange(date)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Description */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      rows={5}
+                      {...field}
+                      placeholder="Description du rendez-vous"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Buttons */}
+            <div className="grid sm:grid-cols-2 gap-4 w-full">
+              {mode === 'edit' ? (
+                <DeleteAppointment
+                  appointmentId={appointmentData?.id}
+                  onDelete={closeModal}
+                />
+              ) : (
+                <Button
+                  type="button"
+                  onClick={closeModal}
+                  variant={'destructive'}
+                  className="w-full"
+                >
+                  Annuler
+                </Button>
+              )}
+              <SubmitButton isLoading={form.formState.isSubmitting}>
+                Sauvegarder
+                <HiOutlineCheckCircle className="text-xl" />
+              </SubmitButton>
+            </div>
+          </form>
+        </Form>
+      </Modal>
+
+      {showAddPatient && (
+        <AddPatientModal
+          isOpen={showAddPatient}
+          closeModal={() => setShowAddPatient(false)}
+          onPatientCreated={handlePatientCreated}
+          initialName={searchValue}
+        />
+      )}
+    </>
   );
 };
 

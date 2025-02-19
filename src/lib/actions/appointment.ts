@@ -1,7 +1,6 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { AppointmentStatus } from '@prisma/client';
 import { db } from '@/db';
 import {
   AppointmentFormValues,
@@ -22,7 +21,6 @@ export async function createAppointment(data: AppointmentFormValues) {
         patientId: data.patientId,
         doctorId: data.doctorId,
         date: data.date,
-        status: data.status as AppointmentStatus,
         consultationType: data.consultationType,
         specializedConsultation: data.specializedConsultation,
         surgeryType: data.surgeryType,
@@ -33,6 +31,7 @@ export async function createAppointment(data: AppointmentFormValues) {
       include: {
         patient: true,
         doctor: true,
+        createdBy: true,
       },
     });
 
@@ -71,7 +70,6 @@ export async function updateAppointment(
         patientId: data.patientId,
         doctorId: data.doctorId,
         date: data.date,
-        status: data.status as AppointmentStatus,
         consultationType: data.consultationType,
         specializedConsultation: data.specializedConsultation,
         surgeryType: data.surgeryType,
@@ -82,6 +80,7 @@ export async function updateAppointment(
       include: {
         patient: true,
         doctor: true,
+        createdBy: true,
       },
     });
 
@@ -102,6 +101,7 @@ export async function getAppointments() {
       include: {
         patient: true,
         doctor: true,
+        createdBy: true,
       },
     });
 
@@ -119,6 +119,13 @@ export async function getAppointmentById(id: string) {
       include: {
         patient: true,
         doctor: true,
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 
@@ -141,6 +148,13 @@ export async function getAppointmentsByPatientId(patientId: string) {
       include: {
         patient: true,
         doctor: true,
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 

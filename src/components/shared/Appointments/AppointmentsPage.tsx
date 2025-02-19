@@ -13,8 +13,8 @@ import { BiPlus } from 'react-icons/bi';
 import AddAppointmentModal from '@/components/shared/Modals/AddAppointmentModal';
 import CustomToolbar from '@/components/shared/Calendar/CustomToolBar';
 import { Appointment } from '@prisma/client';
-import { AppointmentFormValues } from '@/lib/validator';
 import CustomDayHeader from '../Calendar/CustomDayHeader';
+import { AppointmentWithRelations } from '@/types';
 
 interface CalendarEvent {
   id: string;
@@ -22,15 +22,11 @@ interface CalendarEvent {
   start: Date;
   end: Date;
   color: string;
-  resource: Appointment & {
-    patient?: { fullName: string };
-  };
+  resource: AppointmentWithRelations;
 }
 
 interface AppointmentsPageProps {
-  appointments: (Appointment & {
-    patient?: { fullName: string };
-  })[];
+  appointments: AppointmentWithRelations[];
 }
 
 const AppointmentsPage: React.FC<AppointmentsPageProps> = ({
@@ -40,61 +36,62 @@ const AppointmentsPage: React.FC<AppointmentsPageProps> = ({
   const localizer = momentLocalizer(moment);
 
   const [open, setOpen] = useState(false);
-  const [data, setData] = useState<
-    (AppointmentFormValues & { id: string }) | undefined
+  const [selectedAppointment, setSelectedAppointment] = useState<
+    AppointmentWithRelations | undefined
   >(undefined);
   const [view, setView] = useState<View>('month');
   const [date, setDate] = useState(new Date());
 
   const handleClose = () => {
     setOpen(false);
-    setData(undefined);
+    setSelectedAppointment(undefined);
   };
 
   const handleEventClick = (event: CalendarEvent) => {
-    const appointment = event.resource;
-    const formValues: AppointmentFormValues & { id: string } = {
-      id: appointment.id,
-      patientId: appointment.patientId,
-      doctorId: appointment.doctorId,
-      date: new Date(appointment.date),
-      status: appointment.status,
-      consultationType: appointment.consultationType,
-      specializedConsultation: appointment.specializedConsultation || undefined,
-      surgeryType: appointment.surgeryType || undefined,
-      professor: appointment.professor || undefined,
-      description: appointment.description || undefined,
-    };
-    setData(formValues);
+    setSelectedAppointment(event.resource);
     setOpen(true);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'PENDING':
-        return '#FFA500'; // Orange
-      case 'APPROVED':
-        return '#4CAF50'; // Green
-      case 'CANCELED':
-        return '#F44336'; // Red
-      case 'COMPLETED':
-        return '#2196F3'; // Blue
-      default:
-        return '#07b8db'; // Default color
+  const getAppointmentColor = (appointment: Appointment) => {
+    if (appointment.consultationType === 'SURGERY') {
+      switch (appointment.surgeryType) {
+        case 'CATARACT':
+          return '#FF6B6B'; // Coral Red
+        case 'RETINA':
+          return '#4ECDC4'; // Turquoise
+        case 'ANNEXES':
+          return '#45B7D1'; // Ocean Blue
+        case 'STRABISMUS':
+          return '#96CEB4'; // Sage Green
+        case 'CONGENITAL_CATARACT':
+          return '#FFEEAD'; // Soft Yellow
+        default:
+          return '#07b8db'; // Default color
+      }
+    } else {
+      // SPECIALIZED consultation types
+      switch (appointment.specializedConsultation) {
+        case 'GLAUCOMA':
+          return '#6C5B7B'; // Deep Purple
+        case 'SURFACE':
+          return '#C06C84'; // Dusty Rose
+        case 'PEDIATRIC':
+          return '#F67280'; // Coral Pink
+        case 'RETINA_UVEITIS':
+          return '#F8B195'; // Peach
+        default:
+          return '#07b8db'; // Default color
+      }
     }
   };
 
   const events: CalendarEvent[] = appointments.map((appointment) => {
-    // Create a Date object from the appointment date
     const appointmentDate = new Date(appointment.date);
-
-    // Create new Date objects for start and end by combining the appointment date with time
     const start = new Date(
       appointmentDate.getFullYear(),
       appointmentDate.getMonth(),
       appointmentDate.getDate()
     );
-
     const end = new Date(
       appointmentDate.getFullYear(),
       appointmentDate.getMonth(),
@@ -103,10 +100,14 @@ const AppointmentsPage: React.FC<AppointmentsPageProps> = ({
 
     return {
       id: appointment.id,
-      title: `${appointment.patient?.fullName || 'Patient'}`,
+      title: `${appointment.patient?.fullName || 'Patient'} - ${
+        appointment.consultationType === 'SURGERY'
+          ? appointment.surgeryType
+          : appointment.specializedConsultation
+      }`,
       start,
       end,
-      color: getStatusColor(appointment.status),
+      color: getAppointmentColor(appointment),
       resource: appointment,
     };
   });
@@ -117,8 +118,8 @@ const AppointmentsPage: React.FC<AppointmentsPageProps> = ({
         <AddAppointmentModal
           isOpen={open}
           closeModal={handleClose}
-          mode={data ? 'edit' : 'create'}
-          appointmentData={data}
+          mode={selectedAppointment ? 'edit' : 'create'}
+          appointmentData={selectedAppointment}
         />
       )}
       <button
@@ -133,7 +134,7 @@ const AppointmentsPage: React.FC<AppointmentsPageProps> = ({
         startAccessor="start"
         endAccessor="end"
         style={{ height: 900, marginBottom: 50 }}
-        onSelectEvent={(event: CalendarEvent) => handleEventClick(event)}
+        onSelectEvent={handleEventClick}
         date={date}
         onNavigate={setDate}
         view={view}
