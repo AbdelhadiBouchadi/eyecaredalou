@@ -129,7 +129,10 @@ export function AppointmentsTab({ patientId }: AppointmentsTabProps) {
           </thead>
           <tbody className="divide-y divide-gray-200">
             {appointments.map((appointment) => (
-              <tr key={appointment.id}>
+              <tr
+                key={appointment.id}
+                className="border-b border-border hover:bg-greyed transition"
+              >
                 <td className="px-2 py-4 text-sm text-gray-900">
                   {format(new Date(appointment.date), 'PP', { locale: fr })}
                 </td>

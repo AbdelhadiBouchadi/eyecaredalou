@@ -11,6 +11,8 @@ import { PersonalInfoTab } from './tabs/PersonalInfoTab';
 import { HealthInfoTab } from './tabs/HealthInfoTab';
 import { formatBloodGroup } from '@/lib/utils';
 import { PatientWithRelations } from '@/types';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { User } from 'lucide-react';
 
 interface PatientProfileProps {
   patient: PatientWithRelations;
@@ -67,13 +69,23 @@ export function PatientProfile({ patient }: PatientProfileProps) {
       </div>
       <div className="grid grid-cols-12 gap-6 my-8 items-start">
         <div className="col-span-12 flex-colo gap-6 lg:col-span-4 bg-white rounded-xl border-[1px] border-border p-6 lg:sticky top-28">
-          {patient.profileImage && (
-            <img
-              src={patient.profileImage}
-              alt={patient.fullName}
-              className="w-40 h-40 rounded-full object-cover border border-dashed border-subMain"
-            />
-          )}
+          <Avatar>
+            {patient.profileImage ? (
+              <AvatarImage
+                src={patient.profileImage}
+                alt="Profile image"
+                className="w-10 h-10 object-cover object-center"
+              />
+            ) : (
+              <AvatarFallback>
+                {patient.fullName ? (
+                  patient.fullName.charAt(0).toUpperCase()
+                ) : (
+                  <User className="size-12 p-8 rounded-full bg-background text-subMain" />
+                )}
+              </AvatarFallback>
+            )}
+          </Avatar>
           <div className="gap-2 flex-colo">
             <h2 className="text-sm font-semibold capitalize">
               {patient.fullName}

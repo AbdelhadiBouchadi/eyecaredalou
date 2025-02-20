@@ -11,6 +11,7 @@ interface Doctor {
   name: string | null;
   email: string | null;
   specialization: string | null;
+  role: string | null;
 }
 
 interface DoctorsPageProps {

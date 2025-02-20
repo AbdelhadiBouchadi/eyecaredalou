@@ -230,11 +230,24 @@ body {
   .shad-select-content {
     @apply bg-dry border-subMain text-gray-900 !important;
   }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-[6px];
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-primary rounded-md;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-primary-foreground;
+  }
 }
 
 ::-webkit-scrollbar {
   display: none;
 }
+
 input:focus,
 textarea:focus,
 select:focus,

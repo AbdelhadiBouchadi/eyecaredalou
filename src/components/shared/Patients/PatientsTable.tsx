@@ -55,7 +55,7 @@ export const PatientTable: React.FC<PatientTableProps> = ({ data }) => {
         {data.map((patient, index) => (
           <tr
             key={patient.id}
-            className="border-b border-border hover:bg-greyed transition"
+            className="border-b border-border hover:bg-greyed transition no-scrollbar"
           >
             <td className={tdClass}>{index + 1}</td>
             <td className={tdClass}>
@@ -66,7 +66,7 @@ export const PatientTable: React.FC<PatientTableProps> = ({ data }) => {
                   className="w-12 h-12 rounded-full object-cover border border-border"
                 />
               ) : (
-                <span className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
+                <span className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center">
                   {patient.fullName[0].toUpperCase()}
                 </span>
               )}

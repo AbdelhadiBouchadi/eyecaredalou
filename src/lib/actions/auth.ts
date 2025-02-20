@@ -185,23 +185,31 @@ export async function getUsers() {
 
 export async function getUserStats() {
   try {
-    const [doctors, visitors, admins] = await Promise.all([
-      db.user.count({
-        where: { role: UserRole.DOCTOR },
-      }),
-      db.user.count({
-        where: { role: UserRole.VISITOR },
-      }),
-      db.user.count({
-        where: { role: UserRole.ADMIN },
-      }),
-    ]);
+    // Get all users with their roles
+    const users = await db.user.findMany({
+      select: {
+        role: true,
+        specialization: true,
+      },
+    });
 
-    return {
-      doctors,
-      visitors,
-      admins,
-    };
+    // Count users by role, considering that admins who have a specialization are also doctors
+    const stats = users.reduce(
+      (acc, user) => {
+        if (user.role === UserRole.ADMIN) {
+          acc.admins++;
+          acc.doctors++;
+        } else if (user.role === UserRole.DOCTOR) {
+          acc.doctors++;
+        } else if (user.role === UserRole.VISITOR) {
+          acc.visitors++;
+        }
+        return acc;
+      },
+      { doctors: 0, visitors: 0, admins: 0 }
+    );
+
+    return stats;
   } catch (error) {
     console.error('Error fetching user stats:', error);
     throw error;
@@ -237,7 +245,12 @@ export async function getDoctors() {
   try {
     const doctors = await db.user.findMany({
       where: {
-        role: UserRole.DOCTOR,
+        OR: [
+          { role: UserRole.DOCTOR },
+          {
+            AND: { role: UserRole.ADMIN },
+          },
+        ],
       },
       orderBy: {
         name: 'asc',
@@ -247,6 +260,7 @@ export async function getDoctors() {
         name: true,
         email: true,
         specialization: true,
+        role: true,
       },
     });
 
@@ -261,7 +275,12 @@ export async function getDoctorsStats() {
   try {
     const doctorCounts = db.user.count({
       where: {
-        role: UserRole.DOCTOR,
+        OR: [
+          { role: UserRole.DOCTOR },
+          {
+            AND: { role: UserRole.ADMIN },
+          },
+        ],
       },
     });
 

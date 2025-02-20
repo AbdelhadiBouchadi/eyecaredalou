@@ -219,7 +219,7 @@ const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="flex-colo gap-6"
+            className="flex-colo gap-6 my-2"
           >
             {/* Patient Selection */}
             <FormField
