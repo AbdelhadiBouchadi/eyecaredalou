@@ -129,9 +129,23 @@ export const createAppointmentSchema = z
   .object({
     patientId: z.string().min(1, 'Le patient est requis'),
     doctorId: z.string().min(1, 'Le docteur est requis'),
-    date: z.date({
-      required_error: 'La date est requise',
-    }),
+    date: z
+      .date({
+        required_error: 'La date est requise',
+      })
+      .refine(
+        (date) => {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const selectedDate = new Date(date);
+          selectedDate.setHours(0, 0, 0, 0);
+          return selectedDate >= today;
+        },
+        {
+          message:
+            "La date doit être celle d'aujourd'hui ou une date ultérieure",
+        }
+      ),
     consultationType: z.enum(['SPECIALIZED', 'SURGERY'] as const, {
       required_error: 'Le type de consultation est requis',
     }),

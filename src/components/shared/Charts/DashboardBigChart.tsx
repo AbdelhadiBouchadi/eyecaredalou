@@ -13,6 +13,31 @@ const DashboardBigChart = ({
   patientStats,
   appointmentStats,
 }: DashboardBigChartProps) => {
+  // Get current month index (0-11)
+  const currentMonth = new Date().getMonth();
+
+  // Get month names starting from current month
+  const months = [
+    'Janvier',
+    'Février',
+    'Mars',
+    'Avril',
+    'Mai',
+    'Juin',
+    'Juillet',
+    'Août',
+    'Septembre',
+    'Octobre',
+    'Novembre',
+    'Décembre',
+  ];
+
+  // Rotate the months array so it starts with the current month
+  const rotatedMonths = [
+    ...months.slice(currentMonth),
+    ...months.slice(0, currentMonth),
+  ];
+
   const options: ApexCharts.ApexOptions = {
     chart: {
       id: 'area-datetime',
@@ -34,20 +59,7 @@ const DashboardBigChart = ({
       },
     },
     xaxis: {
-      categories: [
-        'Janvier',
-        'Février',
-        'Mars',
-        'Avril',
-        'Mai',
-        'Juin',
-        'Juillet',
-        'Août',
-        'Septembre',
-        'Octobre',
-        'Novembre',
-        'Décembre',
-      ],
+      categories: rotatedMonths,
       labels: {
         show: true,
         style: {

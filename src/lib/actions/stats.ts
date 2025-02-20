@@ -4,84 +4,96 @@ import { db } from '@/db';
 
 export async function getDashboardStats() {
   try {
+    // Get total patients and appointments
     const [totalPatients, totalAppointments] = await Promise.all([
-      // Get total patients
       db.patient.count(),
-      // Get total appointments for today
-      db.appointment.count({
+      db.appointment.count(),
+    ]);
+
+    // Get current month for reference
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+
+    // Initialize arrays for monthly stats
+    const patientStats = new Array(12).fill(0);
+    const appointmentStats = new Array(12).fill(0);
+
+    // Get all patients and appointments for the last 12 months
+    const startDate = new Date(currentYear, currentMonth - 11, 1); // 12 months ago
+    const endDate = new Date(currentYear, currentMonth + 1, 0); // End of current month
+
+    const [patients, appointments] = await Promise.all([
+      db.patient.findMany({
+        where: {
+          createdAt: {
+            gte: startDate,
+            lte: endDate,
+          },
+        },
+        select: {
+          createdAt: true,
+        },
+      }),
+      db.appointment.findMany({
         where: {
           date: {
-            gte: new Date(new Date().setHours(0, 0, 0, 0)),
-            lt: new Date(new Date().setHours(23, 59, 59, 999)),
+            gte: startDate,
+            lte: endDate,
           },
+        },
+        select: {
+          date: true,
         },
       }),
     ]);
 
-    // Get monthly patient counts for the last 12 months
-    const patientStats = await Promise.all(
-      Array.from({ length: 12 }, (_, i) => {
-        const date = new Date();
-        date.setMonth(date.getMonth() - i);
-        const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-        const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    // Process patients
+    patients.forEach((patient) => {
+      const month = patient.createdAt.getMonth();
+      const year = patient.createdAt.getFullYear();
+      const index = (month - currentMonth + 12) % 12;
+      patientStats[index]++;
+    });
 
-        return db.patient.count({
-          where: {
-            createdAt: {
-              gte: startOfMonth,
-              lte: endOfMonth,
-            },
-          },
-        });
-      })
-    );
-
-    // Get monthly appointment counts for the last 12 months
-    const appointmentStats = await Promise.all(
-      Array.from({ length: 12 }, (_, i) => {
-        const date = new Date();
-        date.setMonth(date.getMonth() - i);
-        const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-        const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-
-        return db.appointment.count({
-          where: {
-            date: {
-              gte: startOfMonth,
-              lte: endOfMonth,
-            },
-          },
-        });
-      })
-    );
+    // Process appointments
+    appointments.forEach((appointment) => {
+      const month = appointment.date.getMonth();
+      const year = appointment.date.getFullYear();
+      const index = (month - currentMonth + 12) % 12;
+      appointmentStats[index]++;
+    });
 
     // Calculate percentage changes
     const calculatePercentChange = (
       currentValue: number,
       previousValue: number
     ) => {
-      if (previousValue === 0) return 0;
+      if (previousValue === 0) return currentValue > 0 ? 100 : 0;
       return Number(
         (((currentValue - previousValue) / previousValue) * 100).toFixed(2)
       );
     };
 
+    // Get current and previous month indices
+    const currentMonthIndex = 11; // Last index in our array
+    const prevMonthIndex = 10; // Second to last index
+
     const patientPercentChange = calculatePercentChange(
-      patientStats[0], // Current month
-      patientStats[1] // Previous month
+      patientStats[currentMonthIndex],
+      patientStats[prevMonthIndex]
     );
 
     const appointmentPercentChange = calculatePercentChange(
-      appointmentStats[0], // Current month
-      appointmentStats[1] // Previous month
+      appointmentStats[currentMonthIndex],
+      appointmentStats[prevMonthIndex]
     );
 
     return {
       totalPatients,
       totalAppointments,
-      patientStats: patientStats.reverse(),
-      appointmentStats: appointmentStats.reverse(),
+      patientStats,
+      appointmentStats,
       patientPercentChange,
       appointmentPercentChange,
     };

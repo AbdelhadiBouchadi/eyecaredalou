@@ -82,7 +82,7 @@ const DashboardSmallChart = ({ data, colors }: DashboardSmallChartProps) => {
 
   const series = [
     {
-      name: 'series-1',
+      name: 'Total',
       data: data,
     },
   ];
