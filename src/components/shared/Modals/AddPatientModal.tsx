@@ -138,7 +138,7 @@ const AddPatientModal: React.FC<AddPatientModalProps> = ({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex-colo gap-4"
+          className="flex-colo gap-4 my-2"
         >
           <FormField
             control={form.control}
